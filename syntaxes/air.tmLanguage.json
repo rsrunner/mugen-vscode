@@ -1,0 +1,94 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "AIR",
+	"patterns": [
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#numbers"
+		},
+        {
+			"include": "#sections"
+		},
+        {
+			"include": "#hitboxes"
+		},
+        {
+			"include": "#commands"
+		}
+	],
+	"repository": {
+		"sections": {
+			"name": "keyword.other.air",
+			"begin": "\\s*\\[",
+			"end": "[\\]\\n]",
+			"patterns": [
+				{
+					"include": "#numbers"
+				}
+			]
+		},
+		"comments": {
+			"name": "comment.line.air",
+			"begin": "\\s*;",
+			"end": "$"
+		},
+		"numbers": {
+			"patterns": [
+				{
+					"name": "constant.numeric.air",
+					"match": "-?\\.?\\b[0-9.]+\\b"
+				}
+			]
+		},
+        "commands": {
+            "patterns": [
+                {
+                    "match": "(?i)(interpolate)\\s+(offset|blend|scale|angle)",
+                    "captures": {
+                        "1": {
+                            "name": "support.function.air"
+                        },
+                        "2": {
+                            "name": "constant.language.air"
+                        }
+                    }
+                },
+                {
+                    "name": "support.function.air",
+                    "match": "(?i)loopstart"
+                },
+                {
+                    "name": "support.function.air",
+                    "match": "(?i)AS(\\d+)D(\\d+)",
+                    "captures": {
+                        "1": {
+                            "name": "constant.numeric.air"
+                        },
+                        "2": {
+                            "name": "constant.numeric.air"
+                        }
+                    }
+                },
+                {
+                    "name": "support.function",
+                    "match": "(?i)\\b[ASVH]+\\b"
+                }
+            ]
+        },
+        "hitboxes": {
+            "patterns": [
+                {
+                    "name": "support.function",
+                    "match": "([a-zA-Z0-9_]+)\\s*(\\[)"
+                },
+                {
+                    "name": "support.function",
+                    "match": "([a-zA-Z0-9_]+)\\s*(:)"
+                }
+            ]
+        }
+	},
+	"scopeName": "source.air"
+}

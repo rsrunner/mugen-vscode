@@ -1,0 +1,108 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "CNS",
+	"patterns": [
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#sections"
+		},
+		{
+			"include": "#type"
+		},
+		{
+			"include": "#keyvalue"
+		},
+		{
+			"include": "#functions"
+		},
+		{
+			"include": "#operators"
+		},
+		{
+			"include": "#numbers"
+		},
+		{
+			"include": "#strings"
+		}
+	],
+	"repository": {
+		"sections": {
+			"name": "keyword.other.cns",
+			"begin": "\\s*\\[",
+			"end": "[\\]\\n]",
+			"patterns": [
+				{
+					"include": "#numbers"
+				}
+			]
+		},
+		"type": {
+			"match": "(?i)\\b(type)\\b\\s*(=)\\s*(.*?)(?:$|(?=\\s*;))",
+			"captures": {
+				"1": {
+					"name": "string.other.cns"
+				},
+				"2": {
+					"name": "keyword.operator.cns"
+				},
+				"3":{
+					"name": "support.function"
+				}
+			}
+		},
+		"keyvalue": {
+			"match": "^\\s*(.+?)\\s*(=)\\s*",
+			"captures": {
+				"1": {
+					"name": "string.other.cns"
+				},
+				"2": {
+					"name": "keyword.operator.cns"
+				}
+			}
+		},
+		"comments": {
+			"name": "comment.line.cns",
+			"begin": "\\s*;",
+			"end": "$"
+		},
+		"numbers": {
+			"patterns": [
+				{
+					"name": "constant.numeric.cns",
+					"match": "-?\\.?\\b[0-9.]+\\b"
+				}
+			]
+		},
+		"functions": {
+			"match": "([a-zA-Z0-9_]+)\\s*(\\()",
+			"captures": {
+				"1": {
+					"name": "support.function"
+				}
+			}
+		},
+		"operators": {
+			"name": "keyword.operator.cns",
+			"match": "(?:!|~|-|\\*\\*|\\*|/|%|\\+|>|>=|<|<=|=|!=|:=|&|\\^|\\||&&|\\^\\^|\\|\\|)"
+		},
+		"strings": {
+			"patterns": 
+			[
+				{
+					"name": "string.quoted.double.cns",
+					"begin": "\"",
+					"end": "\""
+				},
+				{
+					"name": "string.quoted.single.cns",
+					"begin": "'",
+					"end": "'"
+				}
+			]
+		}
+	},
+	"scopeName": "source.cns"
+}

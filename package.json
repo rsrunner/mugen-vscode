@@ -1,0 +1,110 @@
+{
+    "name": "mugen-vscode",
+    "displayName": "MUGEN",
+    "description": "VSCode support for MUGEN, a fighting game engine",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.70.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "activationEvents": [
+        "onCommand:mugen-vscode.runMugen",
+        "onCommand:mugen-vscode.runMugenCvk",
+        "onCommand:mugen-vscode.runMugenKvc",
+        "onCommand:mugen-vscode.runSprmake2",
+        "onCommand:mugen-vscode.runSndmaker"
+	],
+	"main": "./out/runmugen.js",
+    "contributes": {
+        "languages": [
+            {
+                "id": "cns",
+                "aliases": ["CNS", "cns"],
+                "extensions": [".cmd",".def",".cns"],
+                "configuration": "./language-configuration.json"
+            },
+            {
+                "id": "air",
+                "aliases": ["AIR", "air"],
+                "extensions": [".air"],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "cns",
+                "scopeName": "source.cns",
+                "path": "./syntaxes/cns.tmLanguage.json"
+            },
+            {
+                "language": "air",
+                "scopeName": "source.air",
+                "path": "./syntaxes/air.tmLanguage.json"
+            }
+        ],
+        "commands": [
+            {
+                "command": "mugen-vscode.runMugen",
+                "title": "Run MUGEN",
+                "when": "resourceExtname in mugen-vscode.supportedFiles",
+                "args": {
+                    "player1": "",
+                    "player2": "",
+                    "stage": ""
+                }
+            },
+            {
+                "command": "mugen-vscode.runMugenCvk",
+                "title": "Run MUGEN - Current vs KFM",
+                "when": "resourceExtname in mugen-vscode.supportedFiles"
+            },
+            {
+                "command": "mugen-vscode.runMugenKvc",
+                "title": "Run MUGEN - KFM vs current",
+                "when": "resourceExtname in mugen-vscode.supportedFiles"
+            },
+            {
+                "command": "mugen-vscode.runSprmake2",
+                "title": "Run sprmake2",
+                "when": "resourceExtname in mugen-vscode.supportedFiles"
+            },
+            {
+                "command": "mugen-vscode.runSndmaker",
+                "title": "Run sndmaker"
+            }
+        ],
+        "configuration": {
+            "title": "MUGEN",
+            "properties": {
+                "mugen.gamePath": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Absolute path to MUGEN game executable. Also used to find sprmake2 and sndmaker."
+                }
+            }
+        }
+    },
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"pretest": "npm run compile && npm run lint",
+		"lint": "eslint src --ext ts",
+		"test": "node ./out/test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.66.0",
+		"@types/glob": "^7.2.0",
+		"@types/mocha": "^9.1.0",
+		"@types/node": "14.x",
+		"@typescript-eslint/eslint-plugin": "^5.16.0",
+		"@typescript-eslint/parser": "^5.16.0",
+		"eslint": "^8.11.0",
+		"glob": "^7.2.0",
+		"mocha": "^9.2.2",
+		"typescript": "^4.5.5",
+		"@vscode/test-electron": "^2.1.3"
+	}
+}
