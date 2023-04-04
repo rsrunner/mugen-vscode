@@ -2,7 +2,7 @@
     "name": "mugen-vscode",
     "displayName": "MUGEN",
     "description": "VSCode support for MUGEN, a fighting game engine",
-    "version": "0.0.1",
+    "version": "1.1.0",
     "engines": {
         "vscode": "^1.70.0"
     },
@@ -10,11 +10,6 @@
         "Programming Languages"
     ],
     "activationEvents": [
-        "onCommand:mugen-vscode.runMugen",
-        "onCommand:mugen-vscode.runMugenCvk",
-        "onCommand:mugen-vscode.runMugenKvc",
-        "onCommand:mugen-vscode.runSprmake2",
-        "onCommand:mugen-vscode.runSndmaker"
 	],
 	"main": "./out/extension.js",
     "contributes": {
