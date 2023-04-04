@@ -1,0 +1,250 @@
+{
+ "AiLevelF": {
+  "doc": "Returns the difficulty level of the player's AI as float value (unlike *AILevel* trigger, which is still floored for compatibility reasons). If AI is enabled on the player, the value ranges from 1 (easiest) to 8 (most difficult). If AI is not enabled on the player, the return value is 0. AI difficulty level with floating point is a result of AI Ramping system (refer to select.def distributed with engine for more information)",
+  "fmt": "AILevelF"
+ },
+ "AnimElemLength": {
+  "doc": "Returns total length of the P1 current animation element.",
+  "fmt": "AnimElemLength"
+ },
+ "AnimLength": {
+  "doc": "Returns total length of the P1 current animation.",
+  "fmt": "AnimLength"
+ },
+ "ComboCount": {
+  "doc": "Returns the total number of hits done by the player's side in the currently ongoing combo. This value is valid as long as the opposite team combo count stays above 0, otherwise it returns 0 too. Returned value always matches current combo counter tracked by lifebar.",
+  "fmt": "ComboCount"
+ },
+ "ConsecutiveWins": {
+  "doc": "Returns number of matches won consecutively by this team side. The counter increases for the winning team at the same time MatchOver trigger starts returning 1. Losing a round resets the counter to 0 and prevents increment for this match.",
+  "fmt": "ConsecutiveWins"
+ },
+ "Dizzy": {
+  "doc": "Returns 1 if character is under [dizzy effect](Miscellaneous-Info/#dizzy) (assigned by [DizzySet](State-controllers/#new_dizzyset) sctrl).",
+  "fmt": "Dizzy"
+ },
+ "DizzyPoints": {
+  "doc": "Returns the amount of [dizzy points](Character-features/#dizzypoints) the player has.",
+  "fmt": "DizzyPoints"
+ },
+ "DizzyPointsMax": {
+  "doc": "Returns the maximum amount of [dizzy points](Character-features/#dizzypoints) the player can have. This is normally the same value as LifeMax (adjustable in character's CNS `[Data]` section).",
+  "fmt": "DizzyPointsMax"
+ },
+ "FirstAttack": {
+  "doc": "Returns 1 if this character has landed the first attack (before any of the opponents or team partners) in the current round. Otherwise returns 0.",
+  "fmt": "FirstAttack"
+ },
+ "FramesPerCount": {
+  "doc": "Returns the `framespercount` value set under lifebar fight.def [Time] group. Can be divided by [TimeRemaining](Triggers/#new_timeremaining), [TimeTotal](Triggers/#new_timetotal), or [TimeElapsed ](Triggers/#new_timeelapsed) to get the representative value of the lifebar timer.",
+  "fmt": "FramesPerCount"
+ },
+ "Float (math)": {
+  "doc": "Converts argument evaluating to int type into float type.",
+  "fmt": "Float(exp)"
+ },
+ "GameMode": {
+  "doc": "Returns the current game mode.\nFollowing game modes are detectable by default:\nThe trigger can be also used to detect [story mode arcs](Miscellaneous-Info/#arcs) and modes added via [external modules](Miscellaneous-Info/#lua_modules).",
+  "fmt": "GameMode = \"\""
+ },
+ "GetPlayerID": {
+  "doc": "Returns ID of the player with specified [playerno](Triggers/#new_playerno). Returns 0 if the player doesn't exist.",
+  "fmt": "GetPlayerID(0)"
+ },
+ "GroundAngle": {
+  "doc": "TODO: ? Related to undocumented [PlatformAngle](State-controllers/#changed_projectile_platformangle) projectile parameter.",
+  "fmt": "GroundAngle"
+ },
+ "GuardBreak": {
+  "doc": "Returns 1 if character is under [guard break](Miscellaneous-Info/#guardbreak) (assigned by [GuardBreakSet](State-controllers/#new_guardbreakset) sctrl).",
+  "fmt": "GuardBreak"
+ },
+ "GuardPoints": {
+  "doc": "Returns the amount of [guard points](Character-features/#guardpoints) the player has.",
+  "fmt": "GuardPoints"
+ },
+ "GuardPointsMax": {
+  "doc": "Returns the maximum amount of [guard points](Character-features/#guardpoints) the player can have. This is normally the same value as LifeMax (adjustable in character's CNS `[Data]` section).",
+  "fmt": "GuardPointsMax"
+ },
+ "HelperName": {
+  "doc": "Returns the helper's name (assigned via helper's name parameter, defaults to \"\\<parent\\>'s helper\" if unique name is not assigned).",
+  "fmt": "HelperName = \"\""
+ },
+ "HitOverridden": {
+  "doc": "Returns 1 during frame in which player has overridden default gethit behavior via HitOverride state controller. Otherwise returns 0.",
+  "fmt": "HitOverridden"
+ },
+ "InCustomState": {
+  "doc": "Returns 1 if character is in custom state (character forced into his opponent's statedef).",
+  "fmt": "InCustomState"
+ },
+ "InDialogue": {
+  "doc": "Returns 1 during ongoing dialogue initiated by [Dialogue](State-controllers/#new_dialogue) state controller.",
+  "fmt": "InDialogue"
+ },
+ "IsAsserted": {
+  "doc": "Returns 1 if the character has specified AssertSpecial state controller flag asserted. Flags that affect all characters at once don't have to be asserted directly by character to be detectable.",
+  "fmt": "IsAsserted(\"\")"
+ },
+ "IsHost": {
+  "doc": "Returns if the player is host in online match.",
+  "fmt": "IsHost"
+ },
+ "LocalScale": {
+  "doc": "Character's scale ratio in relation to screen apsect ratio and state owner coordinate space.",
+  "fmt": "LocalScale"
+ },
+ "MajorVersion": {
+  "doc": "Returns 1 if mugenversion in the def file is 1.0 or higher.",
+  "fmt": "MajorVersion"
+ },
+ "Map": {
+  "doc": "Use the name of the map you want to recognize in parentheses. For example, a character with the below map will return Map(age) as a value set in character DEF file or via various state controllers that can modify character's map. If nothing is set, 0 is returned.",
+  "fmt": "Map(\"\")"
+ },
+ "Max (math)": {
+  "doc": "Takes two arguments, and returns the highest-valued number.",
+  "fmt": "Max(0,0)"
+ },
+ "MemberNo": {
+  "doc": "Returns character's team member position. Team leader is 1, partners receive successive numbers.",
+  "fmt": "MemberNo"
+ },
+ "Min (math)": {
+  "doc": "Takes two arguments, and returns the lowest-valued number.",
+  "fmt": "Min(0,0)"
+ },
+ "MoveCountered": {
+  "doc": "This trigger is valid only when the player is in an attack state. MoveCountered returns 1 on attack contact, at the exact frame that p1 interrupts p2 attack (true for 1 frame, even if both P1 and P2 countered each other's moves). After contact, MoveCountered's return value will increase by 1 for each game tick that P1 is not paused. It gives 0 otherwise. See Details section of vanilla MoveContact trigger for more information.",
+  "fmt": "CounterCount"
+ },
+ "P5Name": {
+  "doc": "Same as P1Name-P4Name, except that these return the name of other team members, if present. If there is no such opponent, then it returns 0 no matter what name is specified. Similarly, P5Name != \"name\" will return 1 no matter what name is specified.",
+  "fmt": "P5Name = \"\""
+ },
+ "P6Name": {
+  "doc": "Same as P1Name-P4Name, except that these return the name of other team members, if present. If there is no such opponent, then it returns 0 no matter what name is specified. Similarly, P5Name != \"name\" will return 1 no matter what name is specified.",
+  "fmt": "P6Name = \"\""
+ },
+ "P7Name": {
+  "doc": "Same as P1Name-P4Name, except that these return the name of other team members, if present. If there is no such opponent, then it returns 0 no matter what name is specified. Similarly, P5Name != \"name\" will return 1 no matter what name is specified.",
+  "fmt": "P7Name = \"\""
+ },
+ "P8Name": {
+  "doc": "Same as P1Name-P4Name, except that these return the name of other team members, if present. If there is no such opponent, then it returns 0 no matter what name is specified. Similarly, P5Name != \"name\" will return 1 no matter what name is specified.",
+  "fmt": "P8Name = \"\""
+ },
+ "PauseTime": {
+  "doc": "Returns the time until the active Pause and/or SuperPause effect expires (whichever lasts longer). The non 0 value is returned only after movetime parameter of these sctrls expires (player can no longer move).\nNormally states are not running during Pause and SuperPause, so this trigger will only work when used in a special statedef -4, which ignores these state controllers.",
+  "fmt": "PauseTime"
+ },
+ "Physics": {
+  "doc": "Returns the player's physics-type. Refer to the section on StateDef in the CNS documentation for more details on physics.",
+  "fmt": "Physics = \"\""
+ },
+ "PlayerNo": {
+  "doc": "Returns character's player number. Player 1 side uses odd numbers (1, 3, 5, 7), player 2 side even numbers (2, 4, 6, 8). Stage [AttachedChar](Stage-features/#info_attachedchar) uses number outside maximum player range (9).",
+  "fmt": "PlayerNo"
+ },
+ "PrevAnim": {
+  "doc": "Returns the number of the anim that the player was last in.",
+  "fmt": "PrevAnim"
+ },
+ "ReversalDefAttr(x,x)": {
+  "doc": "Checks the attribute parameter of the player's currently-active ReversalDef. If the player does not currently have an active ReversalDef, then no parameters will match. Can be used for AI to detect a counter or to code something to happen if it exists.\nNote: ReversalDefAttr!= value1, value2 is logically equivalent to !(ReversalDefAttr= value1, value2).",
+  "fmt": "ReversalDefAttr = 0, 0"
+ },
+ "RandomRange (Math)": {
+  "doc": "Generates pseudo-random numbers uniformly distributed between given range (both bounds inclusive). Its functionality depricates the `VarRandom` state controller. This is now named RandomRange as of I.K.E.M.E.N. Go .99 RC1, Rand will still work but is deprecated.",
+  "fmt": "RandomRange(0,0)"
+ },
+ "RatioLevel": {
+  "doc": "Returns the character's ratio level: from 1 to 4, if the level is set, otherwise it returns 0.",
+  "fmt": "RatioLevel"
+ },
+ "ReceivedHits": {
+  "doc": "Returns the total number of hits done by the opposite team to this character, in the currently ongoing combo. Unlike GetHitVar(hitcount), it takes into account all hits, including those applied by HitAdd. This value is valid as long as the opposite team combo count stays above 0, otherwise it returns 0 too.",
+  "fmt": "ReceivedHits"
+ },
+ "ReceivedDamage": {
+  "doc": "Returns the total damage dealt by the opposite team to this character, in the currently ongoing combo. This value is valid as long as the opposite team combo count stays above 0, otherwise it returns 0 too.",
+  "fmt": "ReceivedDamage"
+ },
+ "RedLife": {
+  "doc": "Returns the amount of [red life](Miscellaneous-Info/#redlife) the player has.",
+  "fmt": "RedLife"
+ },
+ "Round (math)": {
+  "doc": "Returns the rounded value of `val` to specified `precision` (number of digits after the decimal point). `precision` can also be negative or zero.",
+  "fmt": "Round(0,0)"
+ },
+ "RoundType": {
+  "doc": "Returns 3 during final round (the match will be over regardless of which team win), 2 if the match will be over if the opposite team win, or 1 if the match will be over if it's won by this team. Otherwise it returns 0.",
+  "fmt": "RoundType"
+ },
+ "Score": {
+  "doc": "Returns the score points gained in this round by all team members.",
+  "fmt": "Score"
+ },
+ "ScoreTotal": {
+  "doc": "Returns the total score points value. Takes into account all team members, previous rounds and previous matches since the start of this game mode.",
+  "fmt": "ScoreTotal"
+ },
+ "SelfStatenoExist": {
+  "doc": "Works like stateNoExist, except that this only checks P1's state numbers, even when P1 is custom stated by a hit. Returns 1 if there is a statedef with the specified number. Otherwise it returns 0. Use the statedef number you want to recognize in parentheses.",
+  "fmt": "SelfStatenoExist(0)"
+ },
+ "SprPriority": {
+  "doc": "Returns the player's/helper's current SprPriority value.",
+  "fmt": "SprPriority"
+ },
+ "StageBackEdge": {
+  "doc": "Returns the distance to the stage edge behind the player.",
+  "fmt": "StageBackEdge"
+ },
+ "StageConst": {
+  "doc": "Returns the value of one of the stage's constants. Stage constant variables can be set under stage's DEF [[Constants]](Stage-features/#constants) section.",
+  "fmt": "StageConst(\"\")"
+ },
+ "StageFrontEdge": {
+  "doc": "Returns the distance to the stage edge in front of the player.",
+  "fmt": "StageFrontEdge"
+ },
+ "StageTime": {
+  "doc": "Returns the amount of ticks since the last stage background reset. Value returned by this trigger corresponds directly to amount of times stage backgrounds have been updated (taking into account pause, super pause, as well as `resetbg` stage parameter), which allows to reliably synchronize [attachedchar](Stage-features/#info_attachedchar) actions to what's currently displayed by stage.",
+  "fmt": "StageTime"
+ },
+ "Standby": {
+  "doc": "Returns 1 if character is under standby effect (assigned by [TagOut](State-controllers/#new_tagout) sctrl).",
+  "fmt": "Standby"
+ },
+ "TeamLeader": {
+  "doc": "Returns [playerno](Triggers/#new_playerno) of the character that is considered a team leader. In modes where only one player is controlled in particular round (*single*, *turns* and *ratio*) it will be either 1 or 2, depending on team side. In *simul* and *tag* modes, team leader is the first party member (again 1 or 2) by default, but who is considered a leader can be also dynamically adjusted via optional [TagIn](State-controllers/#new_tagin) sctrl *leader* parameter.\nManually swapping leader changes lifebar elements assignment - leader always uses P1 (or P2, depending on team side) lifebar elements, remaining players positions are moved accordingly, in ascending players order.",
+  "fmt": "TeamLeader"
+ },
+ "TeamSize": {
+  "doc": "Returns character's team size (for *turns* mode it returns information that was previously not obtainable, for other team modes the returned value is equivalent to using `NumPartner + 1`)",
+  "fmt": "TeamSize"
+ },
+ "TimeElapsed": {
+  "doc": "Returns the amount of clock ticks since the battle began (0 if time is disabled). Value returned by this trigger corresponds to lifebar timer (only ticks during RoundState = 2)",
+  "fmt": "TimeElapsed"
+ },
+ "TimeRemaining": {
+  "doc": "Returns the amount of clock ticks until time over (-1 if time is disabled). Value returned by this trigger corresponds to lifebar timer (only ticks during RoundState = 2)",
+  "fmt": "TimeRemaining"
+ },
+ "TimeTotal": {
+  "doc": "Returns the total number of clock ticks that have elapsed so far. Takes into account previous rounds and matches since the start of this game mode.",
+  "fmt": "TimeTotal"
+ },
+ "WinHyper": {
+  "doc": "Returns true if the player (or the player's team, in team mode) has won the round with the finishing blow being a hyper attack.",
+  "fmt": "WinHyper"
+ },
+ "WinSpecial": {
+  "doc": "Returns true if the player (or the player's team, in team mode) has won the round with the finishing blow being a special attack.",
+  "fmt": "WinSpecial"
+ }
+}

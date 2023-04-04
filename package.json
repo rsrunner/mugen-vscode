@@ -16,7 +16,7 @@
         "onCommand:mugen-vscode.runSprmake2",
         "onCommand:mugen-vscode.runSndmaker"
 	],
-	"main": "./out/runmugen.js",
+	"main": "./out/extension.js",
     "contributes": {
         "languages": [
             {
@@ -73,6 +73,14 @@
             {
                 "command": "mugen-vscode.runSndmaker",
                 "title": "Run sndmaker"
+            },
+            {
+                "command": "mugen-vscode.normalizeSelection",
+                "title": "Normalize Selection"
+            },
+            {
+                "command": "mugen-vscode.normalizeAll",
+                "title": "Normalize Document"
             }
         ],
         "configuration": {
@@ -82,6 +90,11 @@
                     "type": "string",
                     "default": "",
                     "description": "Absolute path to MUGEN game executable. Also used to find sprmake2 and sndmaker."
+                },
+                "mugen.kungFuman": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Absolute path to Kung Fu Man's DEF file."
                 }
             }
         }

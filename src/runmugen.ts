@@ -45,11 +45,11 @@ function filenameAsChar():string|undefined{
     }
 }
 
-function gamepathCheck(): string{
+function settingCheck(key:string = "gamePath"): string{
     let config = vscode.workspace.getConfiguration("mugen");
-    let gamepath = config.get("gamePath") as string;
+    let gamepath = config.get(key) as string;
     if(!gamepath){
-        vscode.window.showErrorMessage("gamePath is not set. Please set it in your Settings menu.", "Open settings").then(item => {
+        vscode.window.showErrorMessage(key+" is not set. Please set it in your Settings menu.", "Open settings").then(item => {
             if(item){
                 vscode.commands.executeCommand("workbench.action.openGlobalSettings")
             }
@@ -59,8 +59,9 @@ function gamepathCheck(): string{
     return gamepath;
 }
 
+
 function runMugen(player1:string, player2:string, stage:string){
-    let gamepath = gamepathCheck();
+    let gamepath = settingCheck("gamePath");
     if(!gamepath){
         return;
     }
@@ -78,7 +79,7 @@ function runMugen(player1:string, player2:string, stage:string){
 }
 
 function runSprmake2(){
-    let gamepath = gamepathCheck();
+    let gamepath = settingCheck("gamePath");
     let filename = vscode.window.activeTextEditor?.document.fileName;
     if(!gamepath || !filename){
         return;
@@ -91,7 +92,7 @@ function runSprmake2(){
 }
 
 function runSndmaker(){
-    let gamepath = gamepathCheck();
+    let gamepath = settingCheck("gamePath");
     let filename = vscode.window.activeTextEditor?.document.fileName;
     if(!gamepath || !filename){
         return;
@@ -104,22 +105,24 @@ function runSndmaker(){
 }
 
 function runMugenKVC(char:string){
+    let kfm = settingCheck("kungFuMan");
+    if(!kfm){ return; }
     let filename = filenameAsChar();
     if(filename){
-        return runMugen("kfm", filename, "");
+        return runMugen(kfm, filename, "");
     }
 }
 
 function runMugenCVK(char:string){
+    let kfm = settingCheck("kungFuMan");
+    if(!kfm){ return; }
     let filename = filenameAsChar();
     if(filename){
-        return runMugen(filename, "kfm", "");
+        return runMugen(filename, kfm, "");
     }
 }
 
-
 export function activate(context:vscode.ExtensionContext){
-
     vscode.commands.executeCommand("setContext", "mugen-vscode.supportedFiles", [
         ".cmd",
         ".cns",
@@ -139,8 +142,4 @@ export function activate(context:vscode.ExtensionContext){
     for(let i of commands){
         context.subscriptions.push(i);
     }
-}
-
-export function deactivate(){
-    
 }

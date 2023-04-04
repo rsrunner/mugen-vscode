@@ -42,10 +42,10 @@
 			"match": "(?i)\\b(type)\\b\\s*(=)\\s*(.*?)(?:$|(?=\\s*;))",
 			"captures": {
 				"1": {
-					"name": "string.other.cns"
+					"name": "string.other.cns meta.mapping.key.cns"
 				},
 				"2": {
-					"name": "keyword.operator.cns"
+					"name": "keyword.operator.assignment.cns punctuation.separator.mapping.key-value.cns"
 				},
 				"3":{
 					"name": "support.function"
@@ -56,10 +56,10 @@
 			"match": "^\\s*(.+?)\\s*(=)\\s*",
 			"captures": {
 				"1": {
-					"name": "string.other.cns"
+					"name": "string.other.cns meta.mapping.key.cns"
 				},
 				"2": {
-					"name": "keyword.operator.cns"
+					"name": "keyword.operator.assignment.cns punctuation.separator.mapping.key-value.cns"
 				}
 			}
 		},

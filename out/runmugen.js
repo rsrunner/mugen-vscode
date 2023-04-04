@@ -1,6 +1,29 @@
 "use strict";
+/*
+MIT License
+
+Copyright (c) 2022 wily-coyote
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deactivate = exports.activate = void 0;
+exports.activate = void 0;
 const vscode = require("vscode");
 const path = require("path");
 function filenameReplace(arg) {
@@ -21,11 +44,11 @@ function filenameAsChar() {
         return undefined;
     }
 }
-function gamepathCheck() {
+function settingCheck(key = "gamePath") {
     let config = vscode.workspace.getConfiguration("mugen");
-    let gamepath = config.get("gamePath");
+    let gamepath = config.get(key);
     if (!gamepath) {
-        vscode.window.showErrorMessage("gamePath is not set. Please set it in your Settings menu.", "Open settings").then(item => {
+        vscode.window.showErrorMessage(key + " is not set. Please set it in your Settings menu.", "Open settings").then(item => {
             if (item) {
                 vscode.commands.executeCommand("workbench.action.openGlobalSettings");
             }
@@ -35,7 +58,7 @@ function gamepathCheck() {
     return gamepath;
 }
 function runMugen(player1, player2, stage) {
-    let gamepath = gamepathCheck();
+    let gamepath = settingCheck("gamePath");
     if (!gamepath) {
         return;
     }
@@ -52,7 +75,7 @@ function runMugen(player1, player2, stage) {
     });
 }
 function runSprmake2() {
-    let gamepath = gamepathCheck();
+    let gamepath = settingCheck("gamePath");
     let filename = vscode.window.activeTextEditor?.document.fileName;
     if (!gamepath || !filename) {
         return;
@@ -64,7 +87,7 @@ function runSprmake2() {
     terminal.sendText(path.join(path.dirname(gamepath), "sprmake2.exe") + ` "${filename}" && pause && exit`);
 }
 function runSndmaker() {
-    let gamepath = gamepathCheck();
+    let gamepath = settingCheck("gamePath");
     let filename = vscode.window.activeTextEditor?.document.fileName;
     if (!gamepath || !filename) {
         return;
@@ -76,15 +99,23 @@ function runSndmaker() {
     terminal.sendText(path.join(path.dirname(gamepath), "sndmaker.exe") + ` < "${filename}" && pause && exit`);
 }
 function runMugenKVC(char) {
+    let kfm = settingCheck("kungFuMan");
+    if (!kfm) {
+        return;
+    }
     let filename = filenameAsChar();
     if (filename) {
-        return runMugen("kfm", filename, "");
+        return runMugen(kfm, filename, "");
     }
 }
 function runMugenCVK(char) {
+    let kfm = settingCheck("kungFuMan");
+    if (!kfm) {
+        return;
+    }
     let filename = filenameAsChar();
     if (filename) {
-        return runMugen(filename, "kfm", "");
+        return runMugen(filename, kfm, "");
     }
 }
 function activate(context) {
@@ -107,7 +138,4 @@ function activate(context) {
     }
 }
 exports.activate = activate;
-function deactivate() {
-}
-exports.deactivate = deactivate;
 //# sourceMappingURL=runmugen.js.map

@@ -1,0 +1,856 @@
+{
+ "AfterImage": {
+  "req": [],
+  "opt": [
+   "time",
+   "length",
+   "palcolor",
+   "palinvertall",
+   "palbright",
+   "palcontrast",
+   "palpostbright",
+   "paladd",
+   "palmul",
+   "timegap",
+   "framegap",
+   "trans"
+  ],
+  "doc": "Enables player afterimage effects. The character's frames are stored in a history buffer, and are displayed after a delay as afterimages."
+ },
+ "AfterImageTime": {
+  "req": [
+   "time"
+  ],
+  "opt": [],
+  "doc": "Changes the duration of the player's afterimage effects, if currently enabled. If no afterimage effects are being displayed, this controller does nothing.\nKnown bugs: If the timegap parameter in the originating AfterImage controller is not set at 1, using this AfterImageTime will cause the frame positions to be reset."
+ },
+ "AllPalFX": {
+  "req": [],
+  "opt": [],
+  "doc": "Same as PalFX, except that this affects the palette of the background and lifebars as well as the palette of all characters and explods (regardless of the ownpal parameter). See the PalFX section for details on the parameters to AllPalFX."
+ },
+ "AngleAdd": {
+  "req": [
+   "value"
+  ],
+  "opt": [],
+  "doc": "Adds to the drawing rotation angle used by AngleDraw."
+ },
+ "AngleDraw": {
+  "req": [],
+  "opt": [
+   "value"
+  ],
+  "doc": "Draws the player (for 1 frame) rotated about his axis by the angle set by the AngleSet controller. When facing right, a positive angle means a counterclockwise rotation."
+ },
+ "AngleMul": {
+  "req": [
+   "value"
+  ],
+  "opt": [],
+  "doc": "Multiplies the drawing rotation angle used by AngleDraw by the specified factor."
+ },
+ "AngleSet": {
+  "req": [
+   "value"
+  ],
+  "opt": [],
+  "doc": "Sets the drawing rotation angle used by AngleDraw. The angle is initialized at 0."
+ },
+ "AppendToClipboard": {
+  "req": [],
+  "opt": [],
+  "doc": "This is the same as DisplayToClipboard, except that message text is added on a new line, instead of overwriting whatever text is already on the clipboard. See DisplayToClipboard for a format description."
+ },
+ "AssertSpecial": {
+  "req": [],
+  "opt": [],
+  "doc": "This controller allows you to assert up to three special flags simultaneously. MUGEN will automatically \"deassert\" each flag at every game tick, so you must assert a flag for each tick that you want it to be active."
+ },
+ "AttackDist": {
+  "req": [
+   "value"
+  ],
+  "opt": [],
+  "doc": "Changes the value of the guard.dist parameter for the player's current HitDef. The guard.dist is the x-distance from P1 in which P2 will go\ninto a guard state if P2 is holding the direction away from P1.\nThe effect of guard.dist only takes effect when P1 has movetype = A."
+ },
+ "AttackMulSet": {
+  "req": [
+   "value"
+  ],
+  "opt": [],
+  "doc": "Sets the player's attack multiplier. All damage the player gives is scaled by this amount."
+ },
+ "BGPalFX": {
+  "req": [],
+  "opt": [],
+  "doc": "Same as PalFX, except that this affects the palette of the background and lifebars instead of the palette of the character. See the PalFX section for details on the parameters to BGPalFX."
+ },
+ "BindToParent": {
+  "req": [],
+  "opt": [
+   "time",
+   "facing",
+   "pos"
+  ],
+  "doc": "If the player is a helper, binds the player to a specified position relative to its parent. If the player is not a helper, this controller does nothing."
+ },
+ "BindToRoot": {
+  "req": [],
+  "opt": [
+   "time",
+   "facing",
+   "pos"
+  ],
+  "doc": "If the player is a helper, binds the player to a specified position relative to its root. If the player is not a helper, this controller does nothing."
+ },
+ "BindToTarget": {
+  "req": [],
+  "opt": [
+   "time",
+   "ID",
+   "pos"
+  ],
+  "doc": "Binds the player to a specified position relative to the specified target."
+ },
+ "ChangeAnim": {
+  "req": [
+   "value"
+  ],
+  "opt": [
+   "elem"
+  ],
+  "doc": "Changes the action number of the player's animation."
+ },
+ "ChangeAnim2": {
+  "req": [],
+  "opt": [],
+  "doc": "Like ChangeAnim, except this controller should be used if you have placed P2 in a custom state via a hit and wish to change P2's animation to one specified in P1's air file. For example, when making throws, use this to change P2 to a being-thrown animation."
+ },
+ "ChangeState": {
+  "req": [
+   "value"
+  ],
+  "opt": [
+   "ctrl",
+   "anim"
+  ],
+  "doc": "Changes the state number of the player."
+ },
+ "ClearClipboard": {
+  "req": [],
+  "opt": [],
+  "doc": "Erases any text currently on the player's clipboard."
+ },
+ "CtrlSet": {
+  "req": [
+   "value"
+  ],
+  "opt": [],
+  "doc": "Sets the player's control flag."
+ },
+ "DefenceMulSet": {
+  "req": [
+   "value"
+  ],
+  "opt": [],
+  "doc": "Sets the player's defense multiplier. All damage the player takes is scaled by this amount."
+ },
+ "DestroySelf": {
+  "req": [],
+  "opt": [],
+  "doc": "If called by a helper-type character, DestroySelf causes that character to be removed from the field of play. DestroySelf is not valid for non-helper characters."
+ },
+ "DisplayToClipboard": {
+  "req": [],
+  "opt": [],
+  "doc": "This controller is only useful for debugging. DisplayToClipboard clears the player clipboard and prints a specified message to it. Display of the player clipboards is enabled in debug mode (press Ctrl+D)."
+ },
+ "EnvColor": {
+  "req": [],
+  "opt": [
+   "value",
+   "time",
+   "under"
+  ],
+  "doc": "Turns the whole screen a solid color, excepting foreground-layer animations like hit sparks and \"ontop\" explods. Foreground layers of the stage will not be visible."
+ },
+ "EnvShake": {
+  "req": [
+   "time"
+  ],
+  "opt": [
+   "freq",
+   "ampl",
+   "phase"
+  ],
+  "doc": "Causes the screen to shake vertically."
+ },
+ "Explod": {
+  "req": [
+   "anim"
+  ],
+  "opt": [
+   "ID",
+   "pos",
+   "postype",
+   "facing",
+   "vfacing",
+   "bindtime",
+   "vel",
+   "accel",
+   "random",
+   "removetime",
+   "supermove",
+   "supermovetime",
+   "pausemovetime",
+   "scale",
+   "sprpriority",
+   "ontop",
+   "shadow",
+   "ownpal",
+   "removeongethit",
+   "ignorehitpause",
+   "trans"
+  ],
+  "doc": "The Explod controller is a flexible tool for displaying animations such as sparks, dust and other visual effects. Its functionality includes that of GameMakeAnim, which is now deprecated."
+ },
+ "ExplodBindTime": {
+  "req": [],
+  "opt": [
+   "ID",
+   "time"
+  ],
+  "doc": "Changes the position binding time of the player's explods."
+ },
+ "ForceFeedback": {
+  "req": [],
+  "opt": [
+   "waveform",
+   "time",
+   "freq",
+   "ampl",
+   "self"
+  ],
+  "doc": "Creates force feedback for supported force feedback devices. This controller is not implemented in MUGEN 1.0. Parameters to the ForceFeedback controller may not be specified using arithmetic expressions. It is an exception in this regard."
+ },
+ "FallEnvShake": {
+  "req": [],
+  "opt": [],
+  "doc": "Shakes the screen using the fall.envshake parameters set by an attack (see HitDef controller). This controller is effective only if GetHitVar(fall.envshake.time) is not zero, and it sets GetHitVar(fall.envshake.time) to zero after being executed. This controller is used in common1.cns to shake the screen when a player falls, and is not normally useful otherwise."
+ },
+ "GameMakeAnim": {
+  "req": [],
+  "opt": [
+   "value",
+   "under",
+   "pos",
+   "random"
+  ],
+  "doc": "Creates a game animation, like a hit spark or a super charging effect. This controller has been superseded by Explod and is now considered deprecated. Support for it may be removed in future versions."
+ },
+ "Gravity": {
+  "req": [],
+  "opt": [],
+  "doc": "Accelerates the player downwards, using the value of the player's \"yaccel\" constant."
+ },
+ "Helper": {
+  "req": [],
+  "opt": [
+   "helpertype",
+   "name",
+   "ID",
+   "pos",
+   "postype",
+   "facing",
+   "stateno",
+   "keyctrl",
+   "ownpal",
+   "supermovetime",
+   "pausemovetime",
+   "size.xscale",
+   "size.yscale",
+   "size.ground.back",
+   "size.ground.front",
+   "size.air.back",
+   "size.air.front",
+   "size.height",
+   "size.proj.doscale",
+   "size.head.pos",
+   "size.mid.pos",
+   "size.shadowoffset"
+  ],
+  "doc": "Creates another instance of the player as a helper character."
+ },
+ "HitAdd": {
+  "req": [
+   "value"
+  ],
+  "opt": [],
+  "doc": "Adds to the current combo counter."
+ },
+ "HitBy": {
+  "req": [],
+  "opt": [
+   "time"
+  ],
+  "doc": "Temporarily specifies the types of hits that are be allowed hit to the player."
+ },
+ "HitDef": {
+  "req": [
+   "attr"
+  ],
+  "opt": [
+   "hitflag",
+   "guardflag",
+   "affectteam",
+   "animtype",
+   "air.animtype",
+   "fall.animtype",
+   "priority",
+   "damage",
+   "pausetime",
+   "guard.pausetime",
+   "sparkno",
+   "guard.sparkno",
+   "sparkxy",
+   "hitsound",
+   "guardsound",
+   "ground.type",
+   "air.type",
+   "ground.slidetime",
+   "guard.slidetime",
+   "ground.hittime",
+   "guard.hittime",
+   "air.hittime",
+   "guard.ctrltime",
+   "guard.dist",
+   "yaccel",
+   "ground.velocity",
+   "guard.velocity",
+   "air.velocity",
+   "airguard.velocity",
+   "ground.cornerpush.veloff",
+   "air.cornerpush.veloff",
+   "down.cornerpush.veloff",
+   "guard.cornerpush.veloff",
+   "airguard.cornerpush.veloff",
+   "airguard.ctrltime",
+   "air.juggle",
+   "mindist",
+   "maxdist",
+   "snap",
+   "p1sprpriority",
+   "p2sprpriority",
+   "p1facing",
+   "p1getp2facing",
+   "p2facing",
+   "p1stateno",
+   "p2stateno",
+   "p2getp1state",
+   "forcestand",
+   "fall",
+   "fall.xvelocity",
+   "fall.yvelocity",
+   "fall.recover",
+   "fall.recovertime",
+   "fall.damage",
+   "air.fall",
+   "forcenofall",
+   "down.velocity",
+   "down.hittime",
+   "down.bounce",
+   "id",
+   "chainID",
+   "nochainID",
+   "hitonce",
+   "kill",
+   "guard.kill",
+   "fall.kill",
+   "numhits",
+   "getpower",
+   "givepower",
+   "palfx.time",
+   "palfx.mul",
+   "palfx.add",
+   "envshake.time",
+   "envshake.freq",
+   "envshake.ampl",
+   "envshake.phase",
+   "fall.envshake.time",
+   "fall.envshake.freq",
+   "fall.envshake.ampl",
+   "fall.envshake.phase"
+  ],
+  "doc": "Defines a single hit of the player's attack. If the player's Clsn1 box (red) comes in contact with his opponent's Clsn2 box (blue), and the HitDef was define on or before that particular point in time, then the specified effect will be applied. This is one of the more complex, but most commonly-used controllers.\nA single HitDef is valid only for a single hit. To make a move hit several times, you must trigger more than one HitDef during the attack."
+ },
+ "HitFallDamage": {
+  "req": [],
+  "opt": [],
+  "doc": "When the player has been hit and is in a falling state, apply damage\nfrom the fall (specified in the hitdef) to the player."
+ },
+ "HitFallSet": {
+  "req": [],
+  "opt": [
+   "value",
+   "xvel",
+   "yvel"
+  ],
+  "doc": "When the player has been hit, sets the player's fall variables."
+ },
+ "HitFallVel": {
+  "req": [],
+  "opt": [],
+  "doc": "If the player has been hit and is in a falling state, sets the player's velocities to the fall velocities (fall.xvel and fall.yvel) specified in the HitDef."
+ },
+ "HitOverride": {
+  "req": [
+   "attr",
+   "stateno"
+  ],
+  "opt": [
+   "slot",
+   "time",
+   "forceair"
+  ],
+  "doc": "Defines a hit override. If the player is hit by an attack of the specified type, he will go to the specified state number instead of his default gethit behavior. Up to 8 hit overrides can be active at one time."
+ },
+ "HitVelSet": {
+  "req": [],
+  "opt": [
+   "x",
+   "y"
+  ],
+  "doc": "This controller is deprecated. When the player has been hit, sets the desired components of the player's velocity to the appropriate gethit velocities."
+ },
+ "LifeAdd": {
+  "req": [
+   "value"
+  ],
+  "opt": [
+   "kill",
+   "absolute"
+  ],
+  "doc": "Adds the specified amount to the player's life, scaled by the player's defense multiplier if necessary."
+ },
+ "LifeSet": {
+  "req": [
+   "value"
+  ],
+  "opt": [],
+  "doc": "Sets the player's life to the specified value."
+ },
+ "MakeDust": {
+  "req": [],
+  "opt": [
+   "pos",
+   "pos2",
+   "spacing"
+  ],
+  "doc": "This controller is deprecated; use the Explod controller. Creates dust effects."
+ },
+ "ModifyExplod": {
+  "req": [],
+  "opt": [],
+  "doc": "Modifies the parameters of an existing Explod. Syntax is basically\nthe same as Explod. However, this controller is subject to future\nchange. Any code relying on this controller is not guaranteed to\nwork in the future."
+ },
+ "MoveHitReset": {
+  "req": [],
+  "opt": [],
+  "doc": "Resets the movehit flag to 0. That is, after executing MoveHitReset, the triggers MoveContact, MoveGuarded, and MoveHit will all return 0."
+ },
+ "NotHitBy": {
+  "req": [],
+  "opt": [
+   "time"
+  ],
+  "doc": "Temporarily specifies types of hits that are not allowed to hit the player."
+ },
+ "Null": {
+  "req": [],
+  "opt": [],
+  "doc": "Does nothing. May be used for temporarily disabling other state controllers by simply changing their type to Null."
+ },
+ "Offset": {
+  "req": [],
+  "opt": [
+   "x",
+   "y"
+  ],
+  "doc": "Changes the player's display offset. The player is drawn shifted from his axis by this amount."
+ },
+ "PalFX": {
+  "req": [],
+  "opt": [
+   "time",
+   "add",
+   "mul",
+   "sinadd",
+   "invertall",
+   "color"
+  ],
+  "doc": "Applies temporary effects the player's palette. These will also affect the palette of any explods and helpers the player owns, unless they have specified ownpal = 1."
+ },
+ "ParentVarAdd": {
+  "req": [
+   "v",
+   "value",
+   "fv",
+   "value"
+  ],
+  "opt": [],
+  "doc": "If the player is a helper, adds to one of the player's parent's working variables. Either a float variable or an int variable can be added to by this controller. If the player is not a helper, this controller does nothing."
+ },
+ "ParentVarSet": {
+  "req": [
+   "v",
+   "value",
+   "fv",
+   "value"
+  ],
+  "opt": [],
+  "doc": "If the player is a helper, sets one of the parent's working variables. Either a float variable or an int variable can be set by this controller. Does nothing if the player is not a helper."
+ },
+ "Pause": {
+  "req": [
+   "time"
+  ],
+  "opt": [
+   "endcmdbuftime",
+   "movetime",
+   "pausebg"
+  ],
+  "doc": "Pauses the game for the specified amount of time. Player and background updates are not carried out during this time."
+ },
+ "PlayerPush": {
+  "req": [
+   "value"
+  ],
+  "opt": [],
+  "doc": "Disables the player's push checking for one tick. Push checking keeps players from overlapping one another. By temporarily disabling push checking, dodge-type moves in which the player passes through another (but can still be hit) can be implemented."
+ },
+ "PlaySnd": {
+  "req": [
+   "value"
+  ],
+  "opt": [
+   "volumescale",
+   "channel",
+   "lowpriority",
+   "freqmul",
+   "loop",
+   "pan",
+   "abspan"
+  ],
+  "doc": "Plays back a sound.  Notes:"
+ },
+ "PosAdd": {
+  "req": [],
+  "opt": [
+   "x",
+   "y"
+  ],
+  "doc": "Offsets the player's position by the specified amounts. The X coordinate is relative to the player's axis, with positive values moving in the direction that the player is facing. The Y coordinate\nis relative to the player's axis, with negative values moving up."
+ },
+ "PosFreeze": {
+  "req": [],
+  "opt": [
+   "value"
+  ],
+  "doc": "Temporarily freezes the player's position."
+ },
+ "PosSet": {
+  "req": [],
+  "opt": [
+   "x",
+   "y"
+  ],
+  "doc": "Sets the player's position to the specified coordinates. The X coordinate is relative to the center of the screen, with positive values moving right. The Y coordinate is relative to the floor, with negative values moving up."
+ },
+ "PowerAdd": {
+  "req": [
+   "value"
+  ],
+  "opt": [],
+  "doc": "Adds the specified amount to the player's power."
+ },
+ "PowerSet": {
+  "req": [
+   "value"
+  ],
+  "opt": [],
+  "doc": "Sets the amount of power that the player has."
+ },
+ "Projectile": {
+  "req": [],
+  "opt": [
+   "ProjID",
+   "projanim",
+   "projhitanim",
+   "projremanim",
+   "projcancelanim",
+   "projscale",
+   "projremove",
+   "projremovetime",
+   "velocity",
+   "remvelocity",
+   "accel",
+   "velmul",
+   "projhits",
+   "projmisstime",
+   "projpriority",
+   "projsprpriority",
+   "projedgebound",
+   "projstagebound",
+   "projheightbound",
+   "offset",
+   "postype",
+   "projshadow",
+   "supermovetime",
+   "pausemovetime",
+   "afterimage.time"
+  ],
+  "doc": "Creates a projectile for the player. The Projectile controller takes all the parameters of the HitDef controller, which control the HitDef for the projectile. In addition, Projectile has the following additional parameters:"
+ },
+ "RemapPal": {
+  "req": [],
+  "opt": [],
+  "doc": "Changes one of the player's palettes to another."
+ },
+ "RemoveExplod": {
+  "req": [],
+  "opt": [
+   "ID"
+  ],
+  "doc": "Removes all of a player's explods, or just the explods with a specified ID number."
+ },
+ "ReversalDef": {
+  "req": [],
+  "opt": [],
+  "doc": "Defines a reversal. If one of P2's Clns1 boxes comes in contact with one of P1's Clsn1 boxes and a ReversalDef is active, then P1 will reverse P2's attack. Use with p1stateno (and optionally p2stateno) for creating reversal attacks. ReversalDefs take the HitDef parameters pausetime, sparkno, hitsound, p1stateno, and p2stateno, plus:"
+ },
+ "ScreenBound": {
+  "req": [],
+  "opt": [
+   "value",
+   "movecamera"
+  ],
+  "doc": "Specifies whether or not the player's movement should be constrained to the screen or not. Also determines whether the camera should move to follow the player or not. The results of this controller are valid for 1 tick."
+ },
+ "SelfState": {
+  "req": [],
+  "opt": [],
+  "doc": "Like ChangeState, except that this changes a player back to a state in his own state data. Use this when you have placed an opponent player in a custom state via an attack, and wish to restore the opponent to his own states."
+ },
+ "SprPriority": {
+  "req": [
+   "value"
+  ],
+  "opt": [],
+  "doc": "Changes the player's sprite priority. Higher-priority sprites are drawn on top of lower-priority sprites."
+ },
+ "StateTypeSet": {
+  "req": [],
+  "opt": [
+   "statetype",
+   "movetype",
+   "physics"
+  ],
+  "doc": "Changes the current state type and move type. Useful for states that go from the ground into the air, etc."
+ },
+ "SndPan": {
+  "req": [
+   "channel",
+   "pan"
+  ],
+  "opt": [],
+  "doc": "Changes the panning of a currently playing sound. This controller may be continually triggered to smoothly move a sound across the sound field or to have a sound follow the player."
+ },
+ "StopSnd": {
+  "req": [
+   "channel"
+  ],
+  "opt": [],
+  "doc": "Stops any sound which is playing on the specified channel."
+ },
+ "SuperPause": {
+  "req": [],
+  "opt": [
+   "time",
+   "anim",
+   "sound",
+   "pos",
+   "darken",
+   "p2defmul",
+   "poweradd",
+   "unhittable"
+  ],
+  "doc": "Freezes the gameplay and darkens the screen. While each player is frozen, no time passes for them. Use for a dramatic pause during the start of hyper attacks."
+ },
+ "TargetBind": {
+  "req": [],
+  "opt": [
+   "time",
+   "ID",
+   "pos"
+  ],
+  "doc": "Binds the player's specified targets to a specified location relative to the player's axis."
+ },
+ "TargetDrop": {
+  "req": [],
+  "opt": [
+   "excludeID",
+   "keepone"
+  ],
+  "doc": "Drops all targets from the player's target list, except possibly for those having a specified target ID number. Useful for applying effects to only certain targets."
+ },
+ "TargetFacing": {
+  "req": [
+   "value"
+  ],
+  "opt": [
+   "ID"
+  ],
+  "doc": "Turns all targets to face a specified direction relative to the player."
+ },
+ "TargetLifeAdd": {
+  "req": [
+   "value"
+  ],
+  "opt": [
+   "ID",
+   "kill",
+   "absolute"
+  ],
+  "doc": "Adds the specified amount to all targets' life, scaled by the targets' defense multipliers if necessary."
+ },
+ "TargetPowerAdd": {
+  "req": [
+   "value"
+  ],
+  "opt": [
+   "ID"
+  ],
+  "doc": "Adds the specified amount to all targets' power."
+ },
+ "TargetState": {
+  "req": [
+   "value"
+  ],
+  "opt": [
+   "ID"
+  ],
+  "doc": "Makes all targets change to the specified state number."
+ },
+ "TargetVelAdd": {
+  "req": [],
+  "opt": [
+   "x",
+   "y",
+   "ID"
+  ],
+  "doc": "Adds the specified amounts to all targets' velocities. A positive x velocity is in the direction that the target is facing, while a positive y velocity is downward on the screen."
+ },
+ "TargetVelSet": {
+  "req": [],
+  "opt": [
+   "x",
+   "y",
+   "ID"
+  ],
+  "doc": "Sets all targets' velocities to the specified values. A positive x velocity is in the direction that the player is facing, while a positive y velocity is downward on the screen."
+ },
+ "Trans": {
+  "req": [
+   "trans"
+  ],
+  "opt": [
+   "alpha"
+  ],
+  "doc": "Overrides the player's animation transparency parameters for current game tick. Useful for special effects."
+ },
+ "Turn": {
+  "req": [],
+  "opt": [],
+  "doc": "Instantly turns the player to face the opposite direction. Does not play a turning animation."
+ },
+ "VarAdd": {
+  "req": [
+   "v",
+   "value",
+   "fv",
+   "value"
+  ],
+  "opt": [],
+  "doc": "Adds to one of the player's working variables. Either a float variable or an int variable can be added to by this controller."
+ },
+ "VarRandom": {
+  "req": [
+   "v"
+  ],
+  "opt": [
+   "range"
+  ],
+  "doc": "Sets the specified int variable to a random value. Float variables cannot be set by this controller."
+ },
+ "VarRangeSet": {
+  "req": [
+   "value",
+   "fvalue"
+  ],
+  "opt": [
+   "first",
+   "last"
+  ],
+  "doc": "Sets a contiguous range of the player's working variables to the same value. Either float variables or int variables can be set by this controller, but not both at the same time."
+ },
+ "VarSet": {
+  "req": [
+   "v",
+   "value",
+   "fv",
+   "value"
+  ],
+  "opt": [],
+  "doc": "Sets one of the player's working variables. Either a float variable or an int variable can be set by this controller, but not both at the same time."
+ },
+ "VelAdd": {
+  "req": [],
+  "opt": [
+   "x",
+   "y"
+  ],
+  "doc": "Adds the specified amounts to the player's velocity. A positive x velocity is in the direction that the player is facing, while a positive y velocity is downward on the screen."
+ },
+ "VelMul": {
+  "req": [],
+  "opt": [
+   "x",
+   "y"
+  ],
+  "doc": "Multiplies the player's velocity by the specified amounts. A positive x velocity is in the direction that the player is facing, while a positive y velocity is downward on the screen."
+ },
+ "VelSet": {
+  "req": [],
+  "opt": [
+   "x",
+   "y"
+  ],
+  "doc": "Sets the player's velocity to the specified values. A positive x velocity is in the direction that the player is facing, while a positive y velocity is downward on the screen."
+ },
+ "VictoryQuote": {
+  "req": [],
+  "opt": [
+   "value"
+  ],
+  "doc": "Selects a victory quote from the player to display in the next victory screen."
+ },
+ "Width": {
+  "req": [],
+  "opt": [
+   "edge",
+   "player"
+  ],
+  "doc": "Temporarily changes the size of the player's width bar for 1 tick. Useful for controlling the \"pushing\" behavior when the player makes contact with another or with the sides of the screen."
+ }
+}
