@@ -42,7 +42,7 @@ class CNSHoverProvider implements vscode.HoverProvider {
                 return new vscode.Hover([
                     header,
                     `${data.ikemen_sctrl[found].doc}`,
-                    `[Github documentation](http://www.elecbyte.com/mugendocs/sctrls.htmlhttps://github.com/ikemen-engine/Ikemen-GO/wiki/State-controllers#${found.toLowerCase()})`
+                    `[Github documentation](https://github.com/ikemen-engine/Ikemen-GO/wiki/State-controllers#${found.toLowerCase()})`
                 ]);
             }
             else{
@@ -68,7 +68,7 @@ class CNSHoverProvider implements vscode.HoverProvider {
                     return new vscode.Hover([
                         header,
                         `${data.ikemen_trigger[found].doc}`,
-                        `[Github documentation](http://www.elecbyte.com/mugendocs/trigger.html#${word.toLowerCase()})`
+                        `[Github documentation](https://github.com/ikemen-engine/Ikemen-GO/wiki/Triggers#${word.toLowerCase()})`
                     ]);
                 }
                 else {
@@ -96,16 +96,15 @@ class CNSCompletionItemProvider implements vscode.CompletionItemProvider{
             let filtered = _sctrl_index.filter(x => x.toLowerCase().startsWith(word.toLowerCase()));
             let completions = filtered.map(x => {
                 let item = new vscode.CompletionItem(x, vscode.CompletionItemKind.Function);
+                let sctrl:{req:string[], opt:string[], doc:string} = {"req": [], "opt": [], "doc": ""};
                 if(isSctrlIkemen(x)){
-                    let sctrl = data.ikemen_sctrl[x];
-                    item.documentation = `${sctrl.doc}`;
-                    item.insertText = `${x}\n${sctrl.req.map(y => `${y}=`).join("\n")}\n${sctrl.opt.map(y => `; ${y}=`).join("\n")}`;
+                    sctrl = data.ikemen_sctrl[x];
                 }
                 else{
-                    let sctrl = data.mugen_sctrl[x];
-                    item.documentation = `${sctrl.doc}`;
-                    item.insertText = `${x}\n${sctrl.req.map(y => `${y}=`).join("\n")}\n${sctrl.opt.map(y => `; ${y}=`).join("\n")}`;
+                    sctrl = data.mugen_sctrl[x];
                 }
+                item.documentation = `${sctrl.doc}`;
+                item.insertText = `${x}\n${sctrl.req.map(y => `${y}=`).join("\n")}\n${sctrl.opt.map(y => `; ${y}=`).join("\n")}`
                 item.detail = `${x}: state controller`;
                 return item;
             });
@@ -117,17 +116,15 @@ class CNSCompletionItemProvider implements vscode.CompletionItemProvider{
             let filtered = Object.keys(data.mugen_trigger).filter((x) => x.toLowerCase().startsWith(word.toLowerCase()));
             let completions = filtered.map(x => {
                 let item = new vscode.CompletionItem(x, vscode.CompletionItemKind.Function)
+                let trigger:{fmt:string, doc:string} = {"fmt": "", "doc": ""};
                 if(isTriggerIkemen(x)){
-                    let trigger = data.ikemen_trigger[x];
-                    item.insertText = trigger.fmt;
-                    item.documentation = `${trigger.doc}`;
+                    trigger = data.ikemen_trigger[x];
                 }
                 else{
-                    let trigger = data.mugen_trigger[x];
-                    item.insertText = trigger.fmt;
-                    item.documentation = `${trigger.doc}`;
+                    trigger = data.mugen_trigger[x];
                 }
-
+                item.insertText = trigger.fmt;
+                item.documentation = `${trigger.doc}`;
                 item.detail = `${x}: trigger`;
                 return item;
             });
@@ -155,35 +152,31 @@ function adjustSymbols(symbols:vscode.DocumentSymbol[], document:vscode.TextDocu
     }
 }
 
+function guessStateTitle(line:vscode.TextLine, document:vscode.TextDocument){
+    let comment = document.lineAt(Math.max(0, line.lineNumber-1));
+    let comments = [];
+    while (comment.lineNumber > 0 && comment.text.match(/^\s*;/)) {
+        comments.unshift(comment.text.replace(/^\s*;\s*/, ""));
+        comment = document.lineAt(Math.max(0, comment.lineNumber-1));
+        if(comment.lineNumber == 0) comments.unshift(comment.text.replace(/^\s*;\s*/, "")); // include the first line as well
+    }
+    comments = comments.filter((x) => (!x.match(/^[-=]+\s*$/)) && (x.length > 0));
+    return comments.length > 0 ? comments[0] : "";
+}
+
 class CNSDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
     public provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SymbolInformation[] | vscode.DocumentSymbol[]> {
         return new Promise((res, rej) => {
             let symbols = [];
             for (let i = 0; i < document.lineCount; i++) {
                 let line = document.lineAt(i);
-
                 let sectionMatch = line.text.match(/^\s*\[.*?\]/);
                 if(sectionMatch && (sectionMatch.index !== null || sectionMatch.index !== undefined)){
-
-                    let comment = document.lineAt(Math.max(0, i-1));
-                    let comments = [];
-                    while (comment.lineNumber > 0 && comment.text.match(/^\s*;/)) {
-                        comments.unshift(comment.text.replace(/^\s*;\s*/, ""));
-                        comment = document.lineAt(Math.max(0, comment.lineNumber-1));
-                        if(comment.lineNumber == 0) comments.unshift(comment.text.replace(/^\s*;\s*/, "")); // include the first line as well
-                    }
-
-                    comments = comments.filter((x) => (!x.match(/^[-=]+\s*$/)) && (x.length > 0));
-
                     let idx = sectionMatch.index ?? 0;
                     let range = new vscode.Range(line.lineNumber, idx, line.lineNumber, idx+sectionMatch[0].length-1);
                     let name = sectionMatch[0].replace(/^.*?\[|\].*?$/g, "");
-                    let detail = "";
-                    if(comments.length > 0){
-                        detail = comments[0];
-                    }
+                    let detail = guessStateTitle(line, document);
                     if(name.toLowerCase().match(/^state\b/)) continue;
-                    // console.log(line.text, sectionMatch);
                     let symbol = new vscode.DocumentSymbol(name, detail, name.toLowerCase().match(/^statedef\b/) ? vscode.SymbolKind.Function : vscode.SymbolKind.Field, range, range);
                     symbols.push(symbol);
                 }
@@ -196,7 +189,8 @@ class CNSDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                     let sectionMatch = line.text.match(/^\s*\[.*?\]/);
                     if(sectionMatch && (sectionMatch.index !== null || sectionMatch.index !== undefined)){
                         let name = sectionMatch[0].replace(/^.*?\[|\].*?$/g, "");
-                        children.push(new vscode.DocumentSymbol(name, "", vscode.SymbolKind.Function, line.range, line.range));
+                        let detail = guessStateTitle(line, document);
+                        children.push(new vscode.DocumentSymbol(name, detail, vscode.SymbolKind.Function, line.range, line.range));
                     }
                 }
                 adjustSymbols(children, document);
