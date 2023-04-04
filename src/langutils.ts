@@ -125,7 +125,7 @@ class CNSCompletionItemProvider implements vscode.CompletionItemProvider{
                 else{
                     let trigger = data.mugen_trigger[x];
                     item.insertText = trigger.fmt;
-                    item.documentation = `trigger.doc}`;
+                    item.documentation = `${trigger.doc}`;
                 }
 
                 item.detail = `${x}: trigger`;
@@ -157,58 +157,61 @@ function adjustSymbols(symbols:vscode.DocumentSymbol[], document:vscode.TextDocu
 
 class CNSDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
     public provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SymbolInformation[] | vscode.DocumentSymbol[]> {
-        let symbols = [];
-        for (let i = 0; i < document.lineCount; i++) {
-            let line = document.lineAt(i);
+        return new Promise((res, rej) => {
+            let symbols = [];
+            for (let i = 0; i < document.lineCount; i++) {
+                let line = document.lineAt(i);
 
-            let sectionMatch = line.text.match(/^\s*\[.*?\]/);
-            if(sectionMatch && (sectionMatch.index !== null || sectionMatch.index !== undefined)){
-
-                let comment = document.lineAt(Math.max(0, i-1));
-                let comments = [comment.text.replace(/^\s*;\s*/, "")];
-                while(comment != line && comment.text.match(/^\s*;/)){
-                    comments.unshift(comment.text.replace(/^\s*;\s*/, ""));
-                    comment = document.lineAt(comment.lineNumber-1);
-                }
-                comments = comments.filter((x) => (!x.match(/^[-=]+\s*$/)) && (x.length > 0));
-                console.log(comments);
-
-                let idx = sectionMatch.index ?? 0;
-                let range = new vscode.Range(line.lineNumber, idx, line.lineNumber, idx+sectionMatch[0].length-1);
-                let name = sectionMatch[0].replace(/^.*?\[|\].*?$/g, "");
-                let detail = "";
-                if(comments.length > 0){
-                    detail = comments[0];
-                }
-                console.log(name);
-                if(name.toLowerCase().match(/^state\b/)) continue;
-                // console.log(line.text, sectionMatch);
-                let symbol = new vscode.DocumentSymbol(name, detail, name.toLowerCase().match(/^statedef\b/) ? vscode.SymbolKind.Function : vscode.SymbolKind.Field, range, range);
-                symbols.push(symbol);
-            }
-        }
-        adjustSymbols(symbols, document);
-        for(let symbol of symbols){
-            let children = [];
-            for(let j = symbol.range.start.translate(1).line; j < symbol.range.end.line; j++){
-                let line = document.lineAt(j);
                 let sectionMatch = line.text.match(/^\s*\[.*?\]/);
                 if(sectionMatch && (sectionMatch.index !== null || sectionMatch.index !== undefined)){
+
+                    let comment = document.lineAt(Math.max(0, i-1));
+                    let comments = [];
+                    while (comment.lineNumber > 0 && comment.text.match(/^\s*;/)) {
+                        comments.unshift(comment.text.replace(/^\s*;\s*/, ""));
+                        comment = document.lineAt(Math.max(0, comment.lineNumber-1));
+                        if(comment.lineNumber == 0) comments.unshift(comment.text.replace(/^\s*;\s*/, "")); // include the first line as well
+                    }
+
+                    comments = comments.filter((x) => (!x.match(/^[-=]+\s*$/)) && (x.length > 0));
+
+                    let idx = sectionMatch.index ?? 0;
+                    let range = new vscode.Range(line.lineNumber, idx, line.lineNumber, idx+sectionMatch[0].length-1);
                     let name = sectionMatch[0].replace(/^.*?\[|\].*?$/g, "");
-                    children.push(new vscode.DocumentSymbol(name, "", vscode.SymbolKind.Function, line.range, line.range));
+                    let detail = "";
+                    if(comments.length > 0){
+                        detail = comments[0];
+                    }
+                    if(name.toLowerCase().match(/^state\b/)) continue;
+                    // console.log(line.text, sectionMatch);
+                    let symbol = new vscode.DocumentSymbol(name, detail, name.toLowerCase().match(/^statedef\b/) ? vscode.SymbolKind.Function : vscode.SymbolKind.Field, range, range);
+                    symbols.push(symbol);
                 }
             }
-            adjustSymbols(children, document);
-            symbol.children = children;
-        }
-        return symbols;
+            adjustSymbols(symbols, document);
+            for(let symbol of symbols){
+                let children = [];
+                for(let j = symbol.range.start.translate(1).line; j < symbol.range.end.line; j++){
+                    let line = document.lineAt(j);
+                    let sectionMatch = line.text.match(/^\s*\[.*?\]/);
+                    if(sectionMatch && (sectionMatch.index !== null || sectionMatch.index !== undefined)){
+                        let name = sectionMatch[0].replace(/^.*?\[|\].*?$/g, "");
+                        children.push(new vscode.DocumentSymbol(name, "", vscode.SymbolKind.Function, line.range, line.range));
+                    }
+                }
+                adjustSymbols(children, document);
+                symbol.children = children;
+            }
+            res(symbols);
+        })
     }
 }
 
 export function activate(context:vscode.ExtensionContext){
     context.subscriptions.push(vscode.languages.registerHoverProvider("cns", new CNSHoverProvider()));
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider("cns", new CNSCompletionItemProvider(), "="));
-    context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(["cns", "air"], new CNSDocumentSymbolProvider()));
+    context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider("cns", new CNSDocumentSymbolProvider()));
+    context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider("air", new CNSDocumentSymbolProvider()));
     
     const commands = [
         vscode.commands.registerTextEditorCommand("mugen-vscode.normalizeSelection", (textEditor:vscode.TextEditor, edit:vscode.TextEditorEdit) => {
