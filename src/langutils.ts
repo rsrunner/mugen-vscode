@@ -24,6 +24,37 @@ function isSctrlIkemen(keyword:string):boolean{
     else return false;
 }
 
+function normalizeText(text:string): string{
+    return text.replace(/\s*;.*((?:\n|\r\n)+|$)/g, "\n")
+                .replace(/(?:\n|\r\n){2,}/g, "\n")
+                .replace(/(?!^)\[/g, "\n[")
+                .replace(/^(?:\r\n|\n)+|(?:\r\n|\n)+$/g, "");
+}
+
+function adjustSymbols(symbols:vscode.DocumentSymbol[], document:vscode.TextDocument){
+    for(let i = 0; i < symbols.length; i++){
+        let symbol = symbols[i];
+        let nextSymbol = symbols[Math.min(i+1, symbols.length-1)];
+        if(symbol == nextSymbol){
+            symbol.range = new vscode.Range(symbol.range.start, document.validatePosition(new vscode.Position(document.lineCount, 0)));
+            break;
+        };
+        symbol.range = new vscode.Range(symbol.range.start, document.lineAt(nextSymbol.range.start.translate(-1).line).range.end);
+    }
+}
+
+function guessStateTitle(line:vscode.TextLine, document:vscode.TextDocument){
+    let comment = document.lineAt(Math.max(0, line.lineNumber-1));
+    let comments = [];
+    while (comment.lineNumber > 0 && comment.text.match(/^\s*;/)) {
+        comments.unshift(comment.text.replace(/^\s*;\s*/, ""));
+        comment = document.lineAt(Math.max(0, comment.lineNumber-1));
+        if(comment.lineNumber == 0) comments.unshift(comment.text.replace(/^\s*;\s*/, "")); // include the first line as well
+    }
+    comments = comments.filter((x) => (!x.match(/^[-=]+\s*$/)) && (x.length > 0));
+    return comments.length > 0 ? comments[0] : "";
+}
+
 class CNSHoverProvider implements vscode.HoverProvider {
     public provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken):
     vscode.ProviderResult<vscode.Hover>{
@@ -38,20 +69,21 @@ class CNSHoverProvider implements vscode.HoverProvider {
             if(!found) return;
             let header = new vscode.MarkdownString();
             header.appendCodeblock(found, "cns");
+            let doc = "";
+            let link = "";
             if(isSctrlIkemen(found)===true){
-                return new vscode.Hover([
-                    header,
-                    `${data.ikemen_sctrl[found].doc}`,
-                    `[Github documentation](https://github.com/ikemen-engine/Ikemen-GO/wiki/State-controllers#${found.toLowerCase()})`
-                ]);
+                doc = data.ikemen_sctrl[found].doc;
+                link = `[Github documentation](https://github.com/ikemen-engine/Ikemen-GO/wiki/State-controllers#${found.toLowerCase()})`;
             }
             else{
-                return new vscode.Hover([
-                    header,
-                    `${data.mugen_sctrl[found].doc}`,
-                    `[Elecbyte documentation](http://www.elecbyte.com/mugendocs/sctrls.html#${found.toLowerCase()})`
-                ]);
+                doc = data.mugen_sctrl[found].doc;
+                link = `[Elecbyte documentation](http://www.elecbyte.com/mugendocs/sctrls.html#${found.toLowerCase()})`;
             }
+            return new vscode.Hover([
+                header,
+                doc,
+                link
+            ]);
         }
         else if(equal && equal.index && equal.index < position.character){
             let wordRange = document.getWordRangeAtPosition(position);
@@ -61,24 +93,25 @@ class CNSHoverProvider implements vscode.HoverProvider {
             if(found){
                 let header = new vscode.MarkdownString();
                 header.appendCodeblock(found, "cns");
+                let url = "";
+                let doc = "";
                 if(isTriggerIkemen(found)===true){
-                    let url = found.match(/\w+/);
-                    if(!url) return;
-                    word = url[0];
-                    return new vscode.Hover([
-                        header,
-                        `${data.ikemen_trigger[found].doc}`,
-                        `[Github documentation](https://github.com/ikemen-engine/Ikemen-GO/wiki/Triggers#${word.toLowerCase()})`
-                    ]);
+                    let match = found.match(/\w+/);
+                    if(!match) return;
+                    url = match[0];
+                    url = `[Github documentation](https://github.com/ikemen-engine/Ikemen-GO/wiki/Triggers#${url.toLowerCase()})`;
+                    doc = data.ikemen_trigger[found].doc;
                 }
                 else {
-                    let url = data.mugen_trigger[found].fmt.replace(/[\(,\)\*\s]+/g, "-").replace(/^-+|-+$/g,"");
-                    return new vscode.Hover([
-                        header,
-                        `${data.mugen_trigger[found].doc}`,
-                        `[Elecbyte documentation](http://www.elecbyte.com/mugendocs/trigger.html#${url.toLowerCase()})`
-                    ]);
+                    url = data.mugen_trigger[found].fmt.replace(/[\(,\)\*\s]+/g, "-").replace(/^-+|-+$/g,"");
+                    url = `[Elecbyte documentation](http://www.elecbyte.com/mugendocs/trigger.html#${url.toLowerCase()})`;
+                    doc = data.mugen_trigger[found].doc;
                 }
+                return new vscode.Hover([
+                    header,
+                    doc,
+                    url
+                ]);
             }
         }
         return null;
@@ -131,37 +164,6 @@ class CNSCompletionItemProvider implements vscode.CompletionItemProvider{
             return completions;
         }
     }
-}
-
-function normalizeText(text:string): string{
-    return text.replace(/\s*;.*((?:\n|\r\n)+|$)/g, "\n")
-                .replace(/(?:\n|\r\n){2,}/g, "\n")
-                .replace(/(?!^)\[/g, "\n[")
-                .replace(/^(?:\r\n|\n)+|(?:\r\n|\n)+$/g, "");
-}
-
-function adjustSymbols(symbols:vscode.DocumentSymbol[], document:vscode.TextDocument){
-    for(let i = 0; i < symbols.length; i++){
-        let symbol = symbols[i];
-        let nextSymbol = symbols[Math.min(i+1, symbols.length-1)];
-        if(symbol == nextSymbol){
-            symbol.range = new vscode.Range(symbol.range.start, document.validatePosition(new vscode.Position(document.lineCount, 0)));
-            break;
-        };
-        symbol.range = new vscode.Range(symbol.range.start, document.lineAt(nextSymbol.range.start.translate(-1).line).range.end);
-    }
-}
-
-function guessStateTitle(line:vscode.TextLine, document:vscode.TextDocument){
-    let comment = document.lineAt(Math.max(0, line.lineNumber-1));
-    let comments = [];
-    while (comment.lineNumber > 0 && comment.text.match(/^\s*;/)) {
-        comments.unshift(comment.text.replace(/^\s*;\s*/, ""));
-        comment = document.lineAt(Math.max(0, comment.lineNumber-1));
-        if(comment.lineNumber == 0) comments.unshift(comment.text.replace(/^\s*;\s*/, "")); // include the first line as well
-    }
-    comments = comments.filter((x) => (!x.match(/^[-=]+\s*$/)) && (x.length > 0));
-    return comments.length > 0 ? comments[0] : "";
 }
 
 class CNSDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
