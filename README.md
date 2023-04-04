@@ -17,7 +17,7 @@ This extension contributes the following settings:
 
 ## Release Notes
 
-## 1.1.0 - 04-04-2023
+### 1.1.0 - 04-04-2023
 
 Add auto completion and hovers for CNS, both IKEMEN and MUGEN
 
