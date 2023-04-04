@@ -143,6 +143,18 @@ function normalizeText(text:string): string{
                 .replace(/^(?:\r\n|\n)+|(?:\r\n|\n)+$/g, "");
 }
 
+function adjustSymbols(symbols:vscode.DocumentSymbol[], document:vscode.TextDocument){
+    for(let i = 0; i < symbols.length; i++){
+        let symbol = symbols[i];
+        let nextSymbol = symbols[Math.min(i+1, symbols.length-1)];
+        if(symbol == nextSymbol){
+            symbol.range = new vscode.Range(symbol.range.start, document.validatePosition(new vscode.Position(document.lineCount, 0)));
+            break;
+        };
+        symbol.range = new vscode.Range(symbol.range.start, document.lineAt(nextSymbol.range.start.translate(-1).line).range.end);
+    }
+}
+
 class CNSDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
     public provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SymbolInformation[] | vscode.DocumentSymbol[]> {
         let symbols = [];
@@ -175,14 +187,19 @@ class CNSDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                 symbols.push(symbol);
             }
         }
-        for(let i = 0; i < symbols.length; i++){
-            let symbol = symbols[i];
-            let nextSymbol = symbols[Math.min(i+1, symbols.length-1)];
-            if(symbol == nextSymbol){
-                symbol.range = new vscode.Range(symbol.range.start, document.validatePosition(new vscode.Position(document.lineCount, 0)));
-                break;
-            }; // we've reached the end
-            symbol.range = new vscode.Range(symbol.range.start, document.lineAt(nextSymbol.range.start.translate(-1).line).range.end);
+        adjustSymbols(symbols, document);
+        for(let symbol of symbols){
+            let children = [];
+            for(let j = symbol.range.start.translate(1).line; j < symbol.range.end.line; j++){
+                let line = document.lineAt(j);
+                let sectionMatch = line.text.match(/^\s*\[.*?\]/);
+                if(sectionMatch && (sectionMatch.index !== null || sectionMatch.index !== undefined)){
+                    let name = sectionMatch[0].replace(/^.*?\[|\].*?$/g, "");
+                    children.push(new vscode.DocumentSymbol(name, "", vscode.SymbolKind.Function, line.range, line.range));
+                }
+            }
+            adjustSymbols(children, document);
+            symbol.children = children;
         }
         return symbols;
     }
