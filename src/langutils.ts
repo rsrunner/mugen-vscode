@@ -208,7 +208,7 @@ class CNSDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
 export function activate(context:vscode.ExtensionContext){
     context.subscriptions.push(vscode.languages.registerHoverProvider("cns", new CNSHoverProvider()));
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider("cns", new CNSCompletionItemProvider(), "="));
-    context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider("cns", new CNSDocumentSymbolProvider()));
+    context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider(["cns", "air"], new CNSDocumentSymbolProvider()));
     
     const commands = [
         vscode.commands.registerTextEditorCommand("mugen-vscode.normalizeSelection", (textEditor:vscode.TextEditor, edit:vscode.TextEditorEdit) => {
