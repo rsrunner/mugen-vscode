@@ -21,8 +21,8 @@
 	"repository": {
 		"sections": {
 			"name": "keyword.other.air",
-			"begin": "\\s*\\[",
-			"end": "[\\]\\n]",
+			"begin": "^\\s*\\[",
+			"end": "[\\]|\\n]",
 			"patterns": [
 				{
 					"include": "#numbers"
@@ -31,8 +31,8 @@
 		},
 		"comments": {
 			"name": "comment.line.air",
-			"begin": "\\s*;",
-			"end": "$"
+			"begin": ";",
+			"end": "$\n?"
 		},
 		"numbers": {
 			"patterns": [
@@ -61,6 +61,15 @@
                 },
                 {
                     "name": "support.function.air",
+                    "match": "(?i)A(1)",
+                    "captures": {
+                        "1": {
+                            "name": "constant.numeric.air"
+                        }
+                    }
+                },
+                {
+                    "name": "support.function.air",
                     "match": "(?i)AS(\\d+)D(\\d+)",
                     "captures": {
                         "1": {
@@ -72,7 +81,7 @@
                     }
                 },
                 {
-                    "name": "support.function",
+                    "name": "support.function.air",
                     "match": "(?i)\\b[ASVH]+\\b"
                 }
             ]
@@ -80,12 +89,8 @@
         "hitboxes": {
             "patterns": [
                 {
-                    "name": "support.function",
-                    "match": "([a-zA-Z0-9_]+)\\s*(\\[)"
-                },
-                {
-                    "name": "support.function",
-                    "match": "([a-zA-Z0-9_]+)\\s*(:)"
+                    "name": "support.function.air",
+                    "match": "(?i)(clsn1default|clsn2default|clsn1|clsn2)"
                 }
             ]
         }

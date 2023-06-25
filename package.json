@@ -17,13 +17,19 @@
             {
                 "id": "cns",
                 "aliases": ["CNS", "cns"],
-                "extensions": [".cmd",".def",".cns"],
+                "extensions": [".cmd",".def",".cns", ".st"],
                 "configuration": "./language-configuration.json"
             },
             {
                 "id": "air",
                 "aliases": ["AIR", "air"],
                 "extensions": [".air"],
+                "configuration": "./language-configuration.json"
+            },
+            {
+                "id": "zss",
+                "aliases": ["ZSS", "zss"],
+                "extensions": [".zss"],
                 "configuration": "./language-configuration.json"
             }
         ],
@@ -37,7 +43,13 @@
                 "language": "air",
                 "scopeName": "source.air",
                 "path": "./syntaxes/air.tmLanguage.json"
+            },
+            {
+                "language": "zss",
+                "scopeName": "source.zss",
+                "path": "./syntaxes/zss.tmLanguage.json"
             }
+
         ],
         "commands": [
             {

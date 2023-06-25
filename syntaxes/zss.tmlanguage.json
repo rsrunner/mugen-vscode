@@ -1,0 +1,170 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "ZSS",
+	"patterns": [
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#function_declaration"
+		},
+		{
+			"include": "#sections"
+		},
+        {
+            "include": "#keys"
+        },
+		{
+			"include": "#numbers"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#variables"
+		},
+		{
+			"include": "#operators"
+		},
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#modifiers"
+		},
+		{
+			"include": "#functions"
+		}
+	],
+	"repository": {
+		"comments": {
+            "name": "comment.line.number-sign.zss",
+            "begin": "#",
+            "end": "$\\n?"
+        },
+        "function_declaration": {
+			"name": "keyword.other.zss",
+			"begin": "(?i)^\\s*\\[function",
+			"end": "\\]",
+			"patterns": [
+				{
+					"include": "#comments"
+				},
+                {
+                    "begin": "([a-zA-Z-._][a-zA-Z0-9-._]*)\\s*(\\()",
+                    "end": "\\)",
+                    "beginCaptures": {
+                        "1":{
+                            "name": "entity.name.function"
+                        }
+                    },
+                    "patterns": [
+                        {
+                            "match": "([a-zA-Z-._][a-zA-Z0-9-._]*)",
+                            "name": "variable.parameter.zss"
+                        }
+                    ]
+                },
+				{
+					"include": "#numbers"
+				},
+                {
+                    "include": "#keys"
+                }
+			]
+        },
+        "variables": {
+            "match": "\\$[a-zA-Z-._][a-zA-Z0-9-._]*",
+            "name": "variable.name.zss"
+        },
+		"sections": {
+			"name": "keyword.other.zss",
+			"begin": "^\\s*\\[",
+			"end": "\\]",
+			"patterns": [
+				{
+					"include": "#comments"
+				},
+				{
+					"include": "#numbers"
+				},
+                {
+                    "include": "#keys"
+                }
+			]
+		},
+        "numbers": {
+            "patterns": [
+                {
+                    "name": "constant.numeric.zss",
+                    "match": "[0-9]*\\.[0-9]+"
+                },
+                {
+                    "name": "constant.numeric.zss",
+                    "match": "[0-9]+"
+                }
+            ]
+        },
+        "functions": {
+            "patterns": [
+                {
+                    "match": "(?i)(const|stagevar|stageconst|gethitvar)\\s*\\((.*)\\)",
+                    "captures": {
+                        "1": {
+                            "name": "support.function.zss"
+                        },
+                        "2": {
+                            "name": "string.unquoted.zss"
+                        }
+                    }
+                },
+                {
+                    "match": "([a-zA-Z-._][a-zA-Z0-9-._]*)\\s*[(|{]",
+                    "captures": {
+                        "1": {
+                            "name": "support.function.zss"
+                        }
+                    }
+                },
+                {
+                    "match": "([a-zA-Z-._][a-zA-Z0-9-._]*)\\s+([a-zA-Z])",
+                    "captures": {
+                        "1": {
+                            "name": "support.function.zss"
+                        }
+                    }
+                },
+                {
+                    "match": "[a-zA-Z-._][a-zA-Z0-9-._]*",
+                    "name": "support.function.zss"
+                }
+            ]
+        },
+        "keys": {
+            "match": "([a-zA-Z-._][a-zA-Z0-9-._]*)\\s*:",
+            "captures": {
+                "1": {
+                    "name": "string.unquoted.zss"
+                }
+            }
+        },
+        "operators": {
+            "name": "keyword.operator.zss",
+            "match": "(!|~|-|\\*\\*|\\*|/|%|\\+|>|>=|<|<=|=|!=|:=|&|\\^|\\||&&|\\^\\^|\\|\\|)"
+        },
+        "keywords": {
+            "name": "keyword.control.zss",
+            "match": "(?i)\\b(if|else|for|while|let|call|switch|case|default|break|continue)\\b"
+        },
+        "modifiers": {
+            "name": "support.function.zss",
+            "match": "(?i)\\b(ignorehitpause|persistent)\\b"
+        },
+        "strings": {
+            "name": "string.quoted.double",
+            "begin": "\"",
+            "end": "[\"|\\n]"
+        }
+	},
+	"scopeName": "source.zss"
+}

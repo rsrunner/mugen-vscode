@@ -128,7 +128,11 @@ export function activate(context:vscode.ExtensionContext){
         ".cns",
         ".cfg",
         ".def",
-        ".air"
+        ".air",
+        ".zss",
+        ".st",
+        ".lua",
+        ".json"
     ])
 
     let commands = [
