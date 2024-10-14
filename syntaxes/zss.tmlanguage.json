@@ -6,9 +6,6 @@
 			"include": "#comments"
 		},
 		{
-			"include": "#function_declaration"
-		},
-		{
 			"include": "#sections"
 		},
         {
@@ -43,9 +40,6 @@
             "end": "$\\n?"
         },
         "function_declaration": {
-			"name": "keyword.other.zss",
-			"begin": "(?i)^\\s*\\[function",
-			"end": "\\]",
 			"patterns": [
 				{
 					"include": "#comments"
@@ -55,7 +49,7 @@
                     "end": "\\)",
                     "beginCaptures": {
                         "1":{
-                            "name": "entity.name.function"
+                            "name": "entity.name.function.zss"
                         }
                     },
                     "patterns": [
@@ -78,7 +72,7 @@
             "name": "variable.name.zss"
         },
 		"sections": {
-			"name": "keyword.other.zss",
+			"name": "entity.name.section.zss",
 			"begin": "^\\s*\\[",
 			"end": "\\]",
 			"patterns": [
@@ -90,6 +84,9 @@
 				},
                 {
                     "include": "#keys"
+                },
+                {
+                    "include": "#function_declaration"
                 }
 			]
 		},
@@ -144,7 +141,7 @@
             "match": "([a-zA-Z-._][a-zA-Z0-9-._]*)\\s*:",
             "captures": {
                 "1": {
-                    "name": "string.unquoted.zss"
+                    "name": "keyword.zss"
                 }
             }
         },

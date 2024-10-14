@@ -9,6 +9,9 @@
 			"include": "#sections"
 		},
 		{
+			"include": "#specialkeys"
+		},
+		{
 			"include": "#keyvalue"
 		},
 		{
@@ -26,7 +29,7 @@
 	],
 	"repository": {
 		"sections": {
-			"name": "keyword.other.cns",
+			"name": "entity.name.section",
 			"begin": "^\\s*\\[",
 			"end": "[\\]|\\n]",
 			"patterns": [
@@ -35,11 +38,22 @@
 				}
 			]
 		},
+		"specialkeys": {
+			"match": "(?i)^\\s*(trigger(all|[0-9]+)|type)\\s*(=)\\s*",
+			"captures": {
+				"1": {
+					"name": "storage.type.cns"
+				},
+				"3": {
+					"name": "keyword.operator.assignment.cns punctuation.separator.mapping.key-value.cns"
+				}
+			}
+		},
 		"keyvalue": {
 			"match": "^\\s*([a-zA-Z-._][a-zA-Z0-9-._]*)\\s*(=)\\s*",
 			"captures": {
 				"1": {
-					"name": "string.other.cns meta.mapping.key.cns"
+					"name": "keyword.other meta.mapping.key.cns"
 				},
 				"2": {
 					"name": "keyword.operator.assignment.cns punctuation.separator.mapping.key-value.cns"
@@ -111,7 +125,7 @@
 			"match": "(!|~|-|\\*\\*|\\*|/|%|\\+|>|>=|<|<=|=|!=|:=|&|\\^|\\||&&|\\^\\^|\\|\\|)"
 		},
 		"strings": {
-			"patterns": 
+			"patterns":
 			[
 				{
 					"name": "string.quoted.double.cns",

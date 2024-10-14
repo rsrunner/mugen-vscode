@@ -20,7 +20,7 @@
 	],
 	"repository": {
 		"sections": {
-			"name": "keyword.other.air",
+			"name": "entity.name.section.air",
 			"begin": "^\\s*\\[",
 			"end": "[\\]|\\n]",
 			"patterns": [
@@ -90,7 +90,11 @@
             "patterns": [
                 {
                     "name": "support.function.air",
-                    "match": "(?i)(clsn1default|clsn2default|clsn1|clsn2)"
+                    "match": "(?i)(clsn2default|clsn2)"
+                },
+                {
+                    "name": "meta.preprocessor.air",
+                    "match": "(?i)(clsn1default|clsn1)"
                 }
             ]
         }
