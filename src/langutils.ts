@@ -1,27 +1,36 @@
+/*
+MIT License
+
+Copyright (c) 2024 wily-coyote
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 import * as vscode from "vscode";
 import * as data from "./data";
 
-const _sctrl_index:string[] = Object.keys(data.mugen_sctrl).concat(Object.keys(data.ikemen_sctrl));
-const _trigger_index:string[] = Object.keys(data.mugen_trigger).concat(Object.keys(data.ikemen_trigger));
-
 function isTriggerIkemen(keyword:string):boolean{
-    if(data.mugen_trigger.hasOwnProperty(keyword)){
-        return false;
-    }
-    else if(data.ikemen_trigger.hasOwnProperty(keyword)){
-        return true;
-    }
-    else return false;
+    return false;
 }
 
 function isSctrlIkemen(keyword:string):boolean{
-    if(data.mugen_sctrl.hasOwnProperty(keyword)){
-        return false;
-    }
-    else if(data.ikemen_sctrl.hasOwnProperty(keyword)){
-        return true;
-    }
-    else return false;
+    return false;
 }
 
 function normalizeText(text:string): string{
@@ -58,7 +67,7 @@ function guessStateTitle(line:vscode.TextLine, document:vscode.TextDocument){
 class CNSHoverProvider implements vscode.HoverProvider {
     public provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken):
     vscode.ProviderResult<vscode.Hover>{
-        let line = document.lineAt(position.line).text;
+        /*let line = document.lineAt(position.line).text;
         let equal = line.match(/=/);
         if(line.match(/^\s*type/i)){
             let match = line.match(/type\s*=\s*(\w+)/);
@@ -113,15 +122,15 @@ class CNSHoverProvider implements vscode.HoverProvider {
                     url
                 ]);
             }
-        }
+        }*/
         return null;
     }
 }
 
 class CNSCompletionItemProvider implements vscode.CompletionItemProvider{
     public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
-        let line = document.lineAt(position.line).text;
-        let equal = line.match(/=/);        
+        /*let line = document.lineAt(position.line).text;
+        let equal = line.match(/=/);
         if(line.match(/^\s*type/i)){
             let wordRange = document.getWordRangeAtPosition(position);
             if(!wordRange) return;
@@ -162,7 +171,8 @@ class CNSCompletionItemProvider implements vscode.CompletionItemProvider{
                 return item;
             });
             return completions;
-        }
+        }*/
+        return null;
     }
 }
 
@@ -177,10 +187,14 @@ class CNSDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                     let idx = sectionMatch.index ?? 0;
                     let range = new vscode.Range(line.lineNumber, idx, line.lineNumber, idx+sectionMatch[0].length-1);
                     let name = sectionMatch[0].replace(/^.*?\[|\].*?$/g, "");
-                    let detail = guessStateTitle(line, document);
                     if(name.toLowerCase().match(/^state\b/)) continue;
-                    let symbol = new vscode.DocumentSymbol(name, detail, name.toLowerCase().match(/^statedef\b/) ? vscode.SymbolKind.Function : vscode.SymbolKind.Field, range, range);
-                    symbols.push(symbol);
+                    symbols.push(new vscode.DocumentSymbol(
+                        name,
+                        guessStateTitle(line, document),
+                        name.toLowerCase().match(/^statedef\b/) ? vscode.SymbolKind.Function : vscode.SymbolKind.Field,
+                        range,
+                        range
+                    ));
                 }
             }
             adjustSymbols(symbols, document);
@@ -190,9 +204,13 @@ class CNSDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                     let line = document.lineAt(j);
                     let sectionMatch = line.text.match(/^\s*\[.*?\]/);
                     if(sectionMatch && (sectionMatch.index !== null || sectionMatch.index !== undefined)){
-                        let name = sectionMatch[0].replace(/^.*?\[|\].*?$/g, "");
-                        let detail = guessStateTitle(line, document);
-                        children.push(new vscode.DocumentSymbol(name, detail, vscode.SymbolKind.Function, line.range, line.range));
+                        children.push(new vscode.DocumentSymbol(
+                            sectionMatch[0].replace(/^.*?\[|\].*?$/g, ""),
+                            guessStateTitle(line, document),
+                            vscode.SymbolKind.Function,
+                            line.range,
+                            line.range
+                        ));
                     }
                 }
                 adjustSymbols(children, document);
@@ -204,14 +222,16 @@ class CNSDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
 }
 
 export function activate(context:vscode.ExtensionContext){
-    context.subscriptions.push(vscode.languages.registerHoverProvider("cns", new CNSHoverProvider()));
-    context.subscriptions.push(vscode.languages.registerCompletionItemProvider("cns", new CNSCompletionItemProvider(), "="));
-    context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider("cns", new CNSDocumentSymbolProvider()));
-    context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider("air", new CNSDocumentSymbolProvider()));
-    
-    const commands = [
+	console.log(`Dizzy read data now`);
+    data.readData(context).then((pisse)=>{
+        console.log(pisse);
+    });
+    const subscriptions = [
+        vscode.languages.registerHoverProvider("cns", new CNSHoverProvider()),
+        vscode.languages.registerCompletionItemProvider("cns", new CNSCompletionItemProvider(), "="),
+        vscode.languages.registerDocumentSymbolProvider("cns", new CNSDocumentSymbolProvider()),
+        vscode.languages.registerDocumentSymbolProvider("air", new CNSDocumentSymbolProvider()),
         vscode.commands.registerTextEditorCommand("mugen-vscode.normalizeSelection", (textEditor:vscode.TextEditor, edit:vscode.TextEditorEdit) => {
-            let bru:any[] = [];
             textEditor.selections.map(sel => {
                 let text = textEditor.document.getText(sel);
                 let selection:(vscode.Selection|vscode.Range) = sel;
@@ -220,20 +240,19 @@ export function activate(context:vscode.ExtensionContext){
                     selection = textEditor.document.lineAt(sel.start.line).range;
                 }
                 text = normalizeText(text);
-                bru.push([selection, text]);
+                edit.replace(selection, text)
             });
-            for(let i of bru){
-                edit.replace(i[0], i[1]);
-            }
         }),
         vscode.commands.registerTextEditorCommand("mugen-vscode.normalizeAll", (textEditor:vscode.TextEditor, edit:vscode.TextEditorEdit) => {
-            let text = textEditor.document.getText();
-            edit.replace(textEditor.document.validateRange(new vscode.Range(0, 0, textEditor.document.lineCount, 0)), normalizeText(text));
+            const doc = textEditor.document;
+            let text = doc.getText();
+            edit.replace(
+                doc.validateRange(new vscode.Range(0, 0, doc.lineCount, 0)),
+                normalizeText(text)
+            );
         })
     ];
-
-
-    for(let i of commands){
-        context.subscriptions.push(i);
-    }
+    subscriptions.forEach((k) => {
+        context.subscriptions.push(k);
+    });
 }

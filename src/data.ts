@@ -1,9 +1,68 @@
-import * as _mugen_sctrl from "./data/mugen-sctrl.json";
-import * as _ikemen_sctrl from "./data/ikemen-sctrl.json";
-import * as _mugen_trigger from "./data/mugen-trigger.json";
-import * as _ikemen_trigger from "./data/ikemen-trigger.json";
+import * as path from "path"
+import * as vscode from "vscode";
 
-export const mugen_sctrl:{[index:string]:{req:string[], opt:string[], doc:string}} = _mugen_sctrl;
-export const ikemen_sctrl:{[index:string]:{req:string[], opt:string[], doc:string}} = _ikemen_sctrl;
-export const mugen_trigger:{[index:string]:{fmt:string, doc:string}} = _mugen_trigger;
-export const ikemen_trigger:{[index:string]:{fmt:string, doc:string}} = _ikemen_trigger;
+interface Item {
+	name: string,
+	value: string[]
+}
+
+interface DataEntry {
+	fmt?: string,
+	opt?: string[][],
+	req?: string[][],
+	doc: string,
+	ikgo: boolean
+}
+
+export function readData(context: vscode.ExtensionContext){
+	return new Promise((res, rej) => {
+		let mug: Record<string, Record<string, DataEntry>> = {
+			trigger: {},
+			sctrl: {}
+		}
+		let datapath = vscode.Uri.joinPath(context.extension.extensionUri, "out/data/data.tsv");
+		console.log(datapath);
+		vscode.workspace.fs.readFile(datapath).then((array) => {
+			let data = Buffer
+				.from(array)
+				.toString("utf-8");
+			let lines = data
+				.split(/(?:\r\n|\n)/)
+				.filter((x) => x.length > 0);
+			let obj: DataEntry | undefined;
+			for(let line of lines){
+				let fields = line.split("\t");
+				if(fields.length >= 1){
+					let command: string = fields[1];
+					if(command === "sctrl" || command === "trigger"){
+						obj = {
+							doc: "",
+							ikgo: false
+						}
+						mug[command][fields[2]] = obj;
+					} else {
+						if(command === "opt" || command === "req") {
+							let item: Item = {
+								name: fields[2],
+								value: []
+							}
+							for(let i = fields.length; i > 1; i--){
+								item.value.unshift(fields[i]);
+							}
+							if(obj) {
+								if(obj[fields[2]]){
+
+								} else {
+
+								}
+							} else {
+
+							}
+						}
+					}
+				}
+			}
+			res(mug);
+		}, rej)
+	})
+}
