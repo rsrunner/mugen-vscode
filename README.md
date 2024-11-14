@@ -17,22 +17,30 @@ This extension contributes the following settings:
 
 ## Release Notes
 
-### 1.2.0 - 25-06-2023
+### [2.0.0] - 13-11-2024
 
-Add more file extensions to Run MUGEN commands
-Add ZSS syntax
-Rewrite CNS syntax
-Rewrite AIR syntax
+- Use new TSV format from other projects
+- Rewrote hover/completion code
+- Cleaned up code
+- Re-licensed to GPLv3
+- Removed generated CHANGELOG.md (merged into README)
 
-### 1.1.1 - 04-04-2023
+### [1.2.0] - 25-06-2023
 
-Fix CNS/AIR symbol parsing not working in certain conditions
+- Add more file extensions to Run MUGEN commands
+- Add ZSS syntax
+- Rewrite CNS syntax
+- Rewrite AIR syntax
 
-### 1.1.0 - 04-04-2023
+### [1.1.1] - 04-04-2023
 
-Add auto completion and hovers for CNS, both IKEMEN and MUGEN
-Add CNS/AIR symbol parsing for quick navigation
+- Fix CNS/AIR symbol parsing not working in certain conditions
 
-### 1.0.0 - 10-08-2022
+### [1.1.0] - 04-04-2023
 
-Initial release
+- Add auto completion and hovers for CNS, both IKEMEN and MUGEN
+- Add CNS symbol parsing for quick navigation
+
+### [1.0.0] - 10-08-2022
+
+- Initial release
