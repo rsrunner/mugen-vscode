@@ -1,0 +1,3 @@
+[submodule "mugen-nvim"]
+	path = mugen-nvim
+	url = https://github.com/wily-coyote/mugen-nvim
