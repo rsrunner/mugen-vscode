@@ -17,6 +17,11 @@ This extension contributes the following settings:
 
 ## Release Notes
 
+### [2.0.1] - 13-11-2024
+
+- Cleaned up code
+- Snippets can now be navigated using Tab
+
 ### [2.0.0] - 13-11-2024
 
 - Use new TSV format from other projects

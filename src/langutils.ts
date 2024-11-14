@@ -27,6 +27,9 @@ class CNSUtility{
 					.replace(/(?!^)\[/g, "\n[")
 					.replace(/^(?:\r\n|\n)+|(?:\r\n|\n)+$/g, "");
 	}
+	public static isZantei(document: vscode.TextDocument){
+		return document.languageId === "zss";
+	}
 }
 
 class CNSHoverProvider implements vscode.HoverProvider {
@@ -72,6 +75,23 @@ class CNSHoverProvider implements vscode.HoverProvider {
 }
 
 class CNSCompletionItemProvider implements vscode.CompletionItemProvider{
+	private formatItem(string: vscode.SnippetString, item: data.Item, zss: boolean = false, opt: boolean = false){
+		let endl = "\n";
+		let name = `${opt ? "; " : ""}${item.name}=`;
+		if(zss){
+			name = `\t${opt ? "# " : ""}${item.name}: `;
+			endl = ";\n";
+		}
+		string.appendText(name);
+		for(let i = 0; i < item.value.length; i++){
+			string.appendPlaceholder(item.value[i]);
+			if(i < item.value.length-1){
+				string.appendText(", ");
+			}
+		}
+		string.appendText(endl);
+	}
+
 	public buildCompletions(zss: boolean = false){
 		// sctrls
 		let completions: vscode.CompletionItem[] = []
@@ -79,34 +99,21 @@ class CNSCompletionItemProvider implements vscode.CompletionItemProvider{
 			let completion = new vscode.CompletionItem(sctrl, vscode.CompletionItemKind.Function);
 			let entry = CNSUtility.data.sctrl[sctrl];
 			completion.documentation = entry.doc?.replace("\n", "  \n");
-			let insertText: string = "";
-			if(zss) {
-				insertText = `${sctrl}{\n`;
-				if(entry.req){
-					entry.req.forEach(param => {
-						insertText += `\t${param.name}: ${param.value.join(", ")};\n`;
-					})
-				}
-				if(entry.opt){
-					entry.opt.forEach(param => {
-						insertText += `\t# ${param.name}: ${param.value.join(", ")};\n`;
-					})
-				}
-				insertText += `}`;
-			} else {
-				insertText = `[State ${sctrl}]\ntype=${sctrl}\ntrigger1=1\n`;
-				if(entry.req){
-					entry.req.forEach(param => {
-						insertText += `${param.name}=${param.value.join(", ")}\n`;
-					})
-				}
-				if(entry.opt){
-					entry.opt.forEach(param => {
-						insertText += `; ${param.name}=${param.value.join(", ")}\n`;
-					})
-				}
-			}
-			completion.insertText = insertText.trim();
+			let insertText = new vscode.SnippetString("");;
+			if(zss)
+				insertText.value = `${sctrl}{\n`;
+			else
+				insertText.value = `[State ${sctrl}]\ntype=${sctrl}\ntrigger1=1\n`;
+			entry.req?.forEach(param => {
+				this.formatItem(insertText, param, zss, false);
+			})
+			entry.opt?.forEach(param => {
+				this.formatItem(insertText, param, zss, true);
+			})
+			if(zss)
+				insertText.appendText(`}`);
+			insertText.value = insertText.value.trim();
+			completion.insertText = insertText;
 			completion.detail = `${sctrl}: state controller`;
 			completions.push(completion);
 		}
@@ -114,7 +121,13 @@ class CNSCompletionItemProvider implements vscode.CompletionItemProvider{
 			let completion = new vscode.CompletionItem(trigger, vscode.CompletionItemKind.Function);
 			let entry = CNSUtility.data.trigger[trigger];
 			completion.documentation = entry.doc?.replace("\n", "  \n");
-			let insertText = entry.fmt;
+			let insertText = new vscode.SnippetString(entry.fmt??"");
+			let idx = 1;
+			insertText.value = insertText.value.replace(/\$([A-Za-z_]+[0-9]?)/g, (_, g1) => {
+				let ret = `\${${idx}:${g1}}`;
+				idx++;
+				return ret;
+			}).trim();
 			completion.insertText = insertText;
 			completion.detail = `${trigger}: trigger`;
 			completions.push(completion);
@@ -123,21 +136,27 @@ class CNSCompletionItemProvider implements vscode.CompletionItemProvider{
 	}
 
 	public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
-		return this.buildCompletions(document.languageId === "zss");
+		return this.buildCompletions(CNSUtility.isZantei(document));
 	}
 }
 
 class CNSDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
+	private readonly comment_regex = /^\s*;\s*(.*)$/;
+	private readonly comment_regex_zss = /^\s*#\s*(.*)$/;
+	private readonly comment_section_regex = /^[=-]+$/;
+	private readonly section_regex = /^\s*\[(.*?)\]/;
+	private readonly section_regex_zss = /^\s*\[(.*?)(?:\]|\s*;\s*$)/;
+
 	private getStatedefComment(line:vscode.TextLine, document:vscode.TextDocument){
 		let curLineNo = line.lineNumber-1;
 		let curLine = document.lineAt(Math.max(0, curLineNo));
 		let comments: string[] = [];
-		let commentMatch = document.languageId == "zss" ? /^\s*#\s*(.*)$/ : /^\s*;\s*(.*)$/;
+		let regex = CNSUtility.isZantei(document) ? this.comment_regex_zss : this.comment_regex;
 		while(true){
-			let comment = curLine.text.match(commentMatch)
+			let comment = curLine.text.match(regex)
 			if(comment == null) break;
 			let text = comment[1].trim()
-			if((text.match(/^[=-]+$/) == null) && text.length > 0) {
+			if((text.match(this.comment_section_regex) == null) && text.length > 0) {
 				comments.unshift(comment[1])
 			}
 			if(curLineNo == 0) break;
@@ -166,7 +185,8 @@ class CNSDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
 	}
 
 	private constructSymbol(document: vscode.TextDocument, line: vscode.TextLine, ignoreState: boolean = false): vscode.DocumentSymbol | undefined{
-		let section = line.text.match(/^\s*\[(.*?)\]/);
+		let regex = CNSUtility.isZantei(document) ? this.section_regex_zss : this.section_regex;
+		let section = line.text.match(regex);
 		if(section != null && section.index != null){
 			let idx = section.index;
 			let range = new vscode.Range(
