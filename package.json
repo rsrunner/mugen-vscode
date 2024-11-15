@@ -2,7 +2,7 @@
     "name": "mugen-vscode",
     "displayName": "MUGEN",
     "description": "VSCode support for MUGEN, a fighting game engine",
-    "version": "2.0.1",
+    "version": "2.0.2",
     "license": "GPLv3",
     "repository": "https://github.com/wily-coyote/mugen-vscode",
     "engines": {
@@ -27,7 +27,7 @@
                     ".cns",
                     ".st"
                 ],
-                "configuration": "./language-configuration.json"
+                "configuration": "./languages/cns.json"
             },
             {
                 "id": "air",
@@ -38,7 +38,7 @@
                 "extensions": [
                     ".air"
                 ],
-                "configuration": "./language-configuration.json"
+                "configuration": "./languages/cns.json"
             },
             {
                 "id": "zss",
@@ -49,7 +49,7 @@
                 "extensions": [
                     ".zss"
                 ],
-                "configuration": "./language-configuration.json"
+                "configuration": "./languages/zss.json"
             }
         ],
         "grammars": [
