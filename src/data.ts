@@ -62,7 +62,7 @@ export function readData(context: vscode.ExtensionContext){
 								if(obj[key]){
 									(obj[key] as Item[]).push(item);
 								} else {
-									(obj[key] as Item[]) = ([] as Item[]);
+									(obj[key] as Item[]) = ([item] as Item[]);
 								}
 							}
 						break;
