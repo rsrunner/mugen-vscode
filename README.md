@@ -17,6 +17,10 @@ This extension contributes the following settings:
 
 ## Release Notes
 
+### [2.0.3] - 16-11-2024
+
+- Fix first property missing in state controller snippets
+
 ### [2.0.2] - 15-11-2024
 
 - Comment shortcut now inserts hash character properly in ZSS
