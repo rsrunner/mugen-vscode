@@ -17,6 +17,11 @@ This extension contributes the following settings:
 
 ## Release Notes
 
+### [2.0.4] - 18-11-2024
+
+- Add Z-axis bound dist triggers
+- Restructured completion data loading
+
 ### [2.0.3] - 16-11-2024
 
 - Fix first property missing in state controller snippets
