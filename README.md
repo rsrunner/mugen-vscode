@@ -17,6 +17,10 @@ This extension contributes the following settings:
 
 ## Release Notes
 
+### [2.0.5] - 19-11-2024
+
+- Fixed syntax highlighting on function-type triggers
+
 ### [2.0.4] - 18-11-2024
 
 - Add Z-axis bound dist triggers
