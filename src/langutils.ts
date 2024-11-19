@@ -232,7 +232,6 @@ class CNSDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
 export function activate(context:vscode.ExtensionContext){
 	data.readData(context).then((returnal)=>{
 		CNSUtility.data = (returnal as data.TSVData);
-		console.log(CNSUtility.data);
 	});
 	const subscriptions = [
 		vscode.languages.registerHoverProvider(["cns", "zss"], new CNSHoverProvider()),
