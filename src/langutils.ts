@@ -17,7 +17,7 @@
 */
 
 import * as vscode from "vscode";
-import * as data from "./data";
+import * as data from "./data/";
 
 class CNSUtility{
 	public static data: data.TSVData;
