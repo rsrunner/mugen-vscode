@@ -105,7 +105,7 @@
         "functions": {
             "patterns": [
                 {
-                    "match": "(?i)(const|stagevar|stageconst|gethitvar)\\s*\\((.*)\\)",
+                    "match": "(?i)(const|stagevar|stageconst|gethitvar)\\s*\\(([^)]*)\\)",
                     "captures": {
                         "1": {
                             "name": "support.function.zss"
