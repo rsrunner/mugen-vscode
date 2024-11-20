@@ -27,6 +27,9 @@ class CNSUtil{
 	public static readonly section_regex = /^\s*\[(.*?)\]/;
 	public static readonly section_regex_zss = /^\s*\[(.*?)(?:\]|\s*;\s*$)/;
 	public static readonly comma_regex = /,\s*/;
+	public static readonly stateorfunction_regex = /^(?:state|function)/i;
+	public static readonly statedef_regex = /^statedef\b/i;
+	public static readonly state_regex = /^state\b/i;
 
 	public static data: data.TSVData;
 	public static normalizeText(text:string): string{
@@ -116,9 +119,9 @@ class CNSCompletionItemProvider implements vscode.CompletionItemProvider{
 				if(ret) cmp.documentation += " ${ret}";
 				cmp.detail = `${name}: user-defined function`;
 				let insertText = new vscode.SnippetString(`call ${name}(`);
-				for(let i=0; i<args.length; i++){
+				for(let i=0; i < args.length; i++){
 					insertText.appendPlaceholder(args[i]);
-					if(i<args.length-1)
+					if(i < args.length-1)
 						insertText.appendText(", ");
 				}
 				insertText.appendText(");")
@@ -178,7 +181,13 @@ class CNSCompletionItemProvider implements vscode.CompletionItemProvider{
 	}
 }
 
+interface LineMatch{
+	line: vscode.TextLine
+	match: RegExpMatchArray
+}
+
 class CNSDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
+
 	private getStatedefComment(line:vscode.TextLine, document:vscode.TextDocument){
 		let curLineNo = line.lineNumber-1;
 		let curLine = document.lineAt(Math.max(0, curLineNo));
@@ -198,64 +207,71 @@ class CNSDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
 		return comments.length > 0 ? comments[0] : "";
 	}
 
-	private adjustSymbols(symbols:vscode.DocumentSymbol[], document:vscode.TextDocument){
-		for(let i = 0; i < symbols.length; i++){
-			let symbol = symbols[i];
-			let nextSymbol = symbols[Math.min(i+1, symbols.length-1)];
-			if(symbol == nextSymbol){
-				symbol.range = new vscode.Range(
-					symbol.range.start,
-					document.validatePosition(new vscode.Position(document.lineCount, 0))
-				);
-				break;
-			};
-			symbol.range = new vscode.Range(
-				symbol.range.start,
-				document.lineAt(nextSymbol.range.start.translate(-1).line).range.end
-			);
-		}
-	}
-
-	private constructSymbol(document: vscode.TextDocument, line: vscode.TextLine, ignoreState: boolean = false): vscode.DocumentSymbol | undefined{
-		let regex = CNSUtil.isZantei(document) ? CNSUtil.section_regex_zss : CNSUtil.section_regex;
-		let section = line.text.match(regex);
-		if(section != null && section.index != null){
-			let idx = section.index;
-			let range = new vscode.Range(
-				line.lineNumber,
-				idx,
-				line.lineNumber,
-				idx+(section[0].length-1)
-			);
-			let name = section[1];
-			if(ignoreState && name.toLowerCase().match(/^state\b/)) return undefined;
-			return new vscode.DocumentSymbol(
-				name,
-				this.getStatedefComment(line, document),
-				name.toLowerCase().startsWith("state") ? vscode.SymbolKind.Function : vscode.SymbolKind.Field,
-				range,
-				range
+	private adjustRanges(symbols: vscode.DocumentSymbol[], document: vscode.TextDocument){
+		for(let i=0; i<symbols.length; i++){
+			let curr = symbols[i];
+			let next: vscode.DocumentSymbol | undefined = symbols[i+1];
+			let start: vscode.Position = curr.range.start;
+			let finish: vscode.Position = new vscode.Position(document.lineCount - 1, 0)
+			if(next != null){
+				finish = next.range.start;
+				finish = document.lineAt(finish.line-1).range.end;
+			}
+			curr.range = new vscode.Range(
+				start,
+				finish
 			);
 		}
 	}
 
 	public provideDocumentSymbols(document: vscode.TextDocument, _: vscode.CancellationToken): vscode.ProviderResult<vscode.SymbolInformation[] | vscode.DocumentSymbol[]> {
 		return new Promise((res, _) => {
+			let regex = CNSUtil.isZantei(document) ? CNSUtil.section_regex_zss : CNSUtil.section_regex;
 			let symbols: vscode.DocumentSymbol[] = [];
-			for (let i = 0; i < document.lineCount; i++) {
-				let symbol = this.constructSymbol(document, document.lineAt(i), true);
-				if (symbol) symbols.push(symbol);
-			}
-			this.adjustSymbols(symbols, document);
-			for(let symbol of symbols){
-				let children: vscode.DocumentSymbol[] = [];
-				for(let j = symbol.range.start.translate(1).line; j < symbol.range.end.line; j++){
-					let subSymbol = this.constructSymbol(document, document.lineAt(j), false);
-					if (subSymbol) children.push(subSymbol);
+			// first pass, find section lines and construct symbols
+			for (let i=document.lineCount-1; i>=1; i--){
+				let line = document.lineAt(i);
+				let match = line.text.match(regex);
+				if(match != null){
+					let name = match[1];
+					let range = new vscode.Range(
+						line.lineNumber,
+						(match.index ?? 0),
+						line.lineNumber,
+						(match.index ?? 0) + (match[0].length-1)
+					) // temporary range that encompasses the section
+					symbols.unshift(new vscode.DocumentSymbol(
+						name,
+						this.getStatedefComment(line, document),
+						name.match(CNSUtil.stateorfunction_regex) != null ? vscode.SymbolKind.Function : vscode.SymbolKind.Field,
+						range,
+						range
+					));
 				}
-				this.adjustSymbols(children, document);
-				symbol.children = children;
 			}
+			// second pass, adjust ranges
+			this.adjustRanges(symbols, document);
+			// third pass, build hiearchy
+			let parent: vscode.DocumentSymbol | undefined;
+			let remove: vscode.DocumentSymbol[] = [];
+			for (let symbol of symbols){
+				let isStatedef = symbol.name.match(CNSUtil.statedef_regex) != null;
+				if(!isStatedef && parent != null){
+					// the section is a child of this parent,
+					// stage it for removal from the symbols list
+					parent.children.push(symbol);
+					remove.push(symbol);
+				}
+				if(isStatedef){
+					parent = symbol;
+				} else if (symbol.name.match(CNSUtil.state_regex) == null){
+					// symbols that aren't states shouldn't be parented to anything
+					parent = undefined;
+				}
+			}
+			// fourth pass, adjust statedef ranges (needed for CNS)
+			symbols = symbols.filter(x => !remove.includes(x));
+			this.adjustRanges(symbols, document);
 			res(symbols);
 		})
 	}

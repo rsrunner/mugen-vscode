@@ -17,9 +17,13 @@ This extension contributes the following settings:
 
 ## Release Notes
 
+### [2.1.1] - 20-11-2024
+
+- Rewrote the symbol parser
+
 ### [2.1.0] - 19-11-2024
 
-- Added user functions to ZSS
+- Added user function completion to ZSS
 - Highlight ignorehitpause and persistent as preprocessor directives
 - Moved the submodule
 
