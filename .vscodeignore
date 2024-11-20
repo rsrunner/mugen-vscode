@@ -8,3 +8,7 @@ src/**
 **/.eslintrc.json
 **/*.map
 **/*.ts
+
+out/data/**
+!out/data/data.tsv
+!out/data/index.js

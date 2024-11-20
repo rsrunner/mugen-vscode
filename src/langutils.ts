@@ -19,7 +19,15 @@
 import * as vscode from "vscode";
 import * as data from "./data/";
 
-class CNSUtility{
+class CNSUtil{
+	public static readonly function_regex_zss = /^\s*\[function\s+([^(]+)\(([^\)]*)\)\s*([^\]]*)?\]/i;
+	public static readonly comment_regex = /^\s*;\s*(.*)$/;
+	public static readonly comment_regex_zss = /^\s*#\s*(.*)$/;
+	public static readonly comment_section_regex = /^[=-]+$/;
+	public static readonly section_regex = /^\s*\[(.*?)\]/;
+	public static readonly section_regex_zss = /^\s*\[(.*?)(?:\]|\s*;\s*$)/;
+	public static readonly comma_regex = /,\s*/;
+
 	public static data: data.TSVData;
 	public static normalizeText(text:string): string{
 		return text.replace(/\s*;.*((?:\n|\r\n)+|$)/g, "\n")
@@ -36,8 +44,8 @@ class CNSHoverProvider implements vscode.HoverProvider {
 	public buildHoverItems(){
 		// sctrls
 		let hovers: Record<string, vscode.Hover> = {}
-		for(let sctrl of Object.keys(CNSUtility.data.sctrl)){
-			let entry = CNSUtility.data.sctrl[sctrl];
+		for(let sctrl of Object.keys(CNSUtil.data.sctrl)){
+			let entry = CNSUtil.data.sctrl[sctrl];
 			let link = `[Elecbyte documentation](http://www.elecbyte.com/mugendocs/sctrls.html#${sctrl.toLowerCase()})`;
 			if(entry.ikgo === true){
 				link = `[Github documentation](https://github.com/ikemen-engine/Ikemen-GO/wiki/State-controllers-(new)#${sctrl.toLowerCase()})`;
@@ -48,8 +56,8 @@ class CNSHoverProvider implements vscode.HoverProvider {
 				link
 			]));
 		}
-		for(let trigger of Object.keys(CNSUtility.data.trigger)){
-			let entry = CNSUtility.data.trigger[trigger];
+		for(let trigger of Object.keys(CNSUtil.data.trigger)){
+			let entry = CNSUtil.data.trigger[trigger];
 			let link = `[Elecbyte documentation](http://www.elecbyte.com/mugendocs/trigger.html#${trigger.toLowerCase()})`;
 			if(entry.ikgo === true){
 				link = `[Github documentation](https://github.com/ikemen-engine/Ikemen-GO/wiki/Triggers-(new)#${trigger.toLowerCase()})`;
@@ -92,14 +100,43 @@ class CNSCompletionItemProvider implements vscode.CompletionItemProvider{
 		string.appendText(endl);
 	}
 
-	public buildCompletions(zss: boolean = false){
+	private findZssFunctions(document: vscode.TextDocument){
+		let cmps: vscode.CompletionItem[] = [];
+		for(let i=document.lineCount-1; i>=1; i--){
+			let line = document.lineAt(i);
+			let match = line.text.match(CNSUtil.function_regex_zss);
+			if(match){
+				let name = match[1];
+				let args: string[] = [];
+				let ret: string | undefined = match[3];
+				if(match[2]) args = match[2].split(CNSUtil.comma_regex)
+				console.log(name, args, ret);
+				let cmp = new vscode.CompletionItem(name, vscode.CompletionItemKind.Function);
+				cmp.documentation = `function ${name}(${args.join(", ")})`;
+				if(ret) cmp.documentation += " ${ret}";
+				cmp.detail = `${name}: user-defined function`;
+				let insertText = new vscode.SnippetString(`call ${name}(`);
+				for(let i=0; i<args.length; i++){
+					insertText.appendPlaceholder(args[i]);
+					if(i<args.length-1)
+						insertText.appendText(", ");
+				}
+				insertText.appendText(");")
+				cmp.insertText = insertText;
+				cmps.push(cmp);
+			}
+		}
+		return cmps
+	}
+
+	public buildCompletions(document: vscode.TextDocument, zss: boolean = false){
 		// sctrls
-		let completions: vscode.CompletionItem[] = []
-		for(let sctrl of Object.keys(CNSUtility.data.sctrl)){
+		let completions: vscode.CompletionItem[] = zss ? this.findZssFunctions(document) : [];
+		for(let sctrl of Object.keys(CNSUtil.data.sctrl)){
 			let completion = new vscode.CompletionItem(sctrl, vscode.CompletionItemKind.Function);
-			let entry = CNSUtility.data.sctrl[sctrl];
+			let entry = CNSUtil.data.sctrl[sctrl];
 			completion.documentation = entry.doc?.replace("\n", "  \n");
-			let insertText = new vscode.SnippetString("");;
+			let insertText = new vscode.SnippetString("");
 			if(zss)
 				insertText.value = `${sctrl}{\n`;
 			else
@@ -117,9 +154,9 @@ class CNSCompletionItemProvider implements vscode.CompletionItemProvider{
 			completion.detail = `${sctrl}: state controller`;
 			completions.push(completion);
 		}
-		for(let trigger of Object.keys(CNSUtility.data.trigger)){
+		for(let trigger of Object.keys(CNSUtil.data.trigger)){
 			let completion = new vscode.CompletionItem(trigger, vscode.CompletionItemKind.Function);
-			let entry = CNSUtility.data.trigger[trigger];
+			let entry = CNSUtil.data.trigger[trigger];
 			completion.documentation = entry.doc?.replace("\n", "  \n");
 			let insertText = new vscode.SnippetString(entry.fmt??"");
 			let idx = 1;
@@ -136,27 +173,21 @@ class CNSCompletionItemProvider implements vscode.CompletionItemProvider{
 	}
 
 	public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
-		return this.buildCompletions(CNSUtility.isZantei(document));
+		return this.buildCompletions(document, CNSUtil.isZantei(document));
 	}
 }
 
 class CNSDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
-	private readonly comment_regex = /^\s*;\s*(.*)$/;
-	private readonly comment_regex_zss = /^\s*#\s*(.*)$/;
-	private readonly comment_section_regex = /^[=-]+$/;
-	private readonly section_regex = /^\s*\[(.*?)\]/;
-	private readonly section_regex_zss = /^\s*\[(.*?)(?:\]|\s*;\s*$)/;
-
 	private getStatedefComment(line:vscode.TextLine, document:vscode.TextDocument){
 		let curLineNo = line.lineNumber-1;
 		let curLine = document.lineAt(Math.max(0, curLineNo));
 		let comments: string[] = [];
-		let regex = CNSUtility.isZantei(document) ? this.comment_regex_zss : this.comment_regex;
+		let regex = CNSUtil.isZantei(document) ? CNSUtil.comment_regex_zss : CNSUtil.comment_regex;
 		while(true){
 			let comment = curLine.text.match(regex)
 			if(comment == null) break;
 			let text = comment[1].trim()
-			if((text.match(this.comment_section_regex) == null) && text.length > 0) {
+			if((text.match(CNSUtil.comment_section_regex) == null) && text.length > 0) {
 				comments.unshift(comment[1])
 			}
 			if(curLineNo == 0) break;
@@ -185,7 +216,7 @@ class CNSDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
 	}
 
 	private constructSymbol(document: vscode.TextDocument, line: vscode.TextLine, ignoreState: boolean = false): vscode.DocumentSymbol | undefined{
-		let regex = CNSUtility.isZantei(document) ? this.section_regex_zss : this.section_regex;
+		let regex = CNSUtil.isZantei(document) ? CNSUtil.section_regex_zss : CNSUtil.section_regex;
 		let section = line.text.match(regex);
 		if(section != null && section.index != null){
 			let idx = section.index;
@@ -231,7 +262,7 @@ class CNSDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
 
 export function activate(context:vscode.ExtensionContext){
 	data.readData(context).then((returnal)=>{
-		CNSUtility.data = (returnal as data.TSVData);
+		CNSUtil.data = (returnal as data.TSVData);
 	});
 	const subscriptions = [
 		vscode.languages.registerHoverProvider(["cns", "zss"], new CNSHoverProvider()),
@@ -245,7 +276,7 @@ export function activate(context:vscode.ExtensionContext){
 					text = textEditor.document.lineAt(sel.start.line).text;
 					selection = textEditor.document.lineAt(sel.start.line).range;
 				}
-				text = CNSUtility.normalizeText(text);
+				text = CNSUtil.normalizeText(text);
 				edit.replace(selection, text)
 			});
 		}),
@@ -254,7 +285,7 @@ export function activate(context:vscode.ExtensionContext){
 			let text = doc.getText();
 			edit.replace(
 				doc.validateRange(new vscode.Range(0, 0, doc.lineCount, 0)),
-				CNSUtility.normalizeText(text)
+				CNSUtil.normalizeText(text)
 			);
 		})
 	];

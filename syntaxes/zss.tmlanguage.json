@@ -154,7 +154,7 @@
             "match": "(?i)\\b(if|else|for|while|let|call|switch|case|default|break|continue)\\b"
         },
         "modifiers": {
-            "name": "support.function.zss",
+            "name": "meta.preprocessor.string",
             "match": "(?i)\\b(ignorehitpause|persistent)\\b"
         },
         "strings": {

@@ -17,6 +17,12 @@ This extension contributes the following settings:
 
 ## Release Notes
 
+### [2.1.0] - 19-11-2024
+
+- Added user functions to ZSS
+- Highlight ignorehitpause and persistent as preprocessor directives
+- Moved the submodule
+
 ### [2.0.5] - 19-11-2024
 
 - Fixed syntax highlighting on function-type triggers
