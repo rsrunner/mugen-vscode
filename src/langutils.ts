@@ -123,6 +123,7 @@ class CNSCompletionItemProvider implements vscode.CompletionItemProvider{
 				}
 				insertText.appendText(");")
 				cmp.insertText = insertText;
+				cmp.filterText = "call"+name;
 				cmps.push(cmp);
 			}
 		}
